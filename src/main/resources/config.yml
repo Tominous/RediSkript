@@ -1,0 +1,13 @@
+Redis:
+  Password: "yHy0d2zdBlRmaSPj3CiBwEv5V3XxBTLTrCsGW7ntBnzhfxPxXJS6Q1aTtR6DSfAtCZr2VxWnsungXHTcF94a4bsWEpGAvjL6XMU"
+  Host: "127.0.0.1"
+  MaxConnections: 20
+  Threads: 10
+  Port: 6379
+  TimeOut: 40
+  useSSL: true
+
+Channels:
+  - "Channel1"
+  - "Channel2"
+  - "Channel3"

@@ -1,0 +1,6 @@
+main: net.limework.skLimework.AddonPlugin
+name: SKLimework
+version: 1.0
+author: limework.net
+depend:
+  - Skript
