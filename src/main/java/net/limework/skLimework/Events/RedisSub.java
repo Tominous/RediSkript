@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.json.JSONObject;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.util.List;
 
@@ -17,7 +18,17 @@ public class RedisSub extends JedisPubSub {
         this.j = j;
         String[] ss = channels.toArray(new String[0]);
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin,
-        () -> this.j.subscribe(this, ss));
+        () -> {
+
+            try{
+                this.j.subscribe(this, ss);
+            } catch (JedisConnectionException je){
+                this.unSubAndCloseConnection();
+                Bukkit.broadcastMessage("Redis Went down!");
+            }
+
+        });
+
     }
 
     @Override

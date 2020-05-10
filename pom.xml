@@ -6,9 +6,9 @@
 
     <groupId>net.limework.addon</groupId>
     <artifactId>SkLimework</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>>
-
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+	
     <build>
         <plugins>
             <plugin>
@@ -18,29 +18,57 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <encoding>UTF-8</encoding>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.3</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
-
-    <repositories>
-
+    
+	<repositories>
         <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+		<repository>
+            <id>PaperMC</id>
+            <url>https://repo.destroystokyo.com/repository/maven-public/</url>
+        </repository>
+		<repository>
+            <id>sk89q</id>
+            <url>http://maven.sk89q.com/repo</url>
         </repository>
     </repositories>
 
     <dependencies>
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.15.2-R0.1-SNAPSHOT</version>
+            <groupId>com.github.skriptlang</groupId>
+            <artifactId>Skript</artifactId>
+            <version>2.4.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
             <version>1.15.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>

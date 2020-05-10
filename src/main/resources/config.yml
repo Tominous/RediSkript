@@ -4,7 +4,7 @@ Redis:
   MaxConnections: 20
   Threads: 10
   Port: 6379
-  TimeOut: 40
+  TimeOut: 40000
   useSSL: true
 
 Channels:

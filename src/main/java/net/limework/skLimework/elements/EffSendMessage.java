@@ -12,6 +12,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.event.Event;
 import org.json.JSONObject;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class EffSendMessage extends Effect {
 //"hi"
@@ -34,7 +35,11 @@ public class EffSendMessage extends Effect {
             return;
         }
         plugin.getJedisExecutionService().execute(() -> {
-            Jedis j = plugin.getJedisPool().getResource();
+            Jedis j;
+            try {j = plugin.getJedisPool().getResource();}catch (JedisConnectionException e){
+                Bukkit.broadcastMessage("Redis is down!!! dont send messages");
+                return;
+            }
             JSONObject json = new JSONObject();
             try {
                 json.put("Message", message);
