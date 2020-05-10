@@ -10,26 +10,48 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.util.List;
 
-public class RedisSub extends JedisPubSub {
+
+public class RedisSub extends JedisPubSub implements Runnable{
+
     private AddonPlugin plugin;
     private Jedis j;
+    private String[] channels;
+
     public RedisSub(AddonPlugin plugin, Jedis j, List<String> channels) {
         this.plugin = plugin;
         this.j = j;
-        String[] ss = channels.toArray(new String[0]);
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin,
-        () -> {
-
-            try{
-                this.j.subscribe(this, ss);
-            } catch (JedisConnectionException je){
-                this.unSubAndCloseConnection();
-                Bukkit.broadcastMessage("Redis Went down!");
-            }
-
-        });
-
+        this.channels = channels.toArray(new String[0]);
     }
+
+    @Override
+    public void run(){
+        try{
+            this.j.subscribe(this, channels);
+        } catch (JedisConnectionException je){
+            plugin.getLogger().warning("Lost connection to redis!");
+            newJedis();
+        }
+    }
+
+
+    private void newJedis() {
+        this.unsubscribe();
+        this.j.close();
+        while (true){
+            try {
+                plugin.getLogger().info("reconnecting to Redis!");
+                this.j = plugin.getJedisPool().getResource();
+                plugin.getLogger().info("Connected!");
+                break;
+            }catch (JedisConnectionException e){
+                plugin.getLogger().warning("reconnecting to Redis has Failed! retrying in 4 seconds!");
+                try { Thread.sleep(4000);}catch (InterruptedException ignored){}
+            }
+        }
+        plugin.getJedisExecutionService().execute(this);
+    }
+
+
 
     @Override
     public void onMessage(String channel, String message) {
@@ -44,8 +66,9 @@ public class RedisSub extends JedisPubSub {
 
     }
 
-    public void unSubAndCloseConnection(){
+    public void shutdown(){
         this.unsubscribe();
         j.close();
     }
+
 }

@@ -7,13 +7,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="61139119-6327-48a6-9183-0df6346ed8d8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/SkLimework_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/SkLimework_jar.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/AddonPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/AddonPlugin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/DoNotUse/Tester.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/Events/RedisSub.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/Events/RedisSub.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/elements/EffSendMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/elements/EffSendMessage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config.yml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

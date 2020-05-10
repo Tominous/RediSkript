@@ -35,11 +35,7 @@ public class EffSendMessage extends Effect {
             return;
         }
         plugin.getJedisExecutionService().execute(() -> {
-            Jedis j;
-            try {j = plugin.getJedisPool().getResource();}catch (JedisConnectionException e){
-                Bukkit.broadcastMessage("Redis is down!!! dont send messages");
-                return;
-            }
+            Jedis j = plugin.getJedisPool().getResource();
             JSONObject json = new JSONObject();
             try {
                 json.put("Message", message);
@@ -63,4 +59,5 @@ public class EffSendMessage extends Effect {
         this.message = (Expression<String>) expressions[1];
         return true;
     }
+
 }

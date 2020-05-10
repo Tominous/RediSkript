@@ -67,6 +67,7 @@ public class AddonPlugin extends JavaPlugin {
                 this.getConfig().getBoolean("Redis.useSSL"));
         redisSub = new RedisSub(this, jedisPool.getResource(), this.getConfig().getStringList("Channels"));
         service = Executors.newFixedThreadPool(this.getConfig().getInt("Redis.Threads"));
+        service.execute(redisSub);
 
         Bukkit.getLogger().info("[Govindas limework Addon] was enabled!");
     }
@@ -74,7 +75,7 @@ public class AddonPlugin extends JavaPlugin {
 
     @Override
     public void onDisable(){
-       redisSub.unSubAndCloseConnection();
+       redisSub.shutdown();
        service.shutdown();
         try { service.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS); } catch (InterruptedException e) { e.printStackTrace(); }
         jedisPool.close();
