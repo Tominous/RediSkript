@@ -35,7 +35,7 @@ public class RedisSub extends JedisPubSub implements Runnable{
 
 
     private void newJedis() {
-        this.unsubscribe();
+        //this.unsubscribe();
         this.j.close();
         while (true){
             try {
