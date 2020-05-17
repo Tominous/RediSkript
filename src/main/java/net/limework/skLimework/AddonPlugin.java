@@ -77,8 +77,8 @@ public class AddonPlugin extends JavaPlugin {
     public void onDisable(){
        redisSub.shutdown();
        service.shutdown();
-        try { service.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS); } catch (InterruptedException e) { e.printStackTrace(); }
-        jedisPool.close();
+       try { service.awaitTermination(3, TimeUnit.SECONDS); } catch (InterruptedException e) { e.printStackTrace(); }
+       jedisPool.close();
     }
 
     public AddonPlugin getInstance() {

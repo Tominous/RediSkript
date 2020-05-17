@@ -27,7 +27,7 @@ public class RedisSub extends JedisPubSub implements Runnable{
     public void run(){
         try{
             this.j.subscribe(this, channels);
-        } catch (JedisConnectionException je){
+        } catch (Exception je){
             plugin.getLogger().warning("Lost connection to redis!");
             newJedis();
         }
@@ -43,7 +43,7 @@ public class RedisSub extends JedisPubSub implements Runnable{
                 this.j = plugin.getJedisPool().getResource();
                 plugin.getLogger().info("Connected!");
                 break;
-            }catch (JedisConnectionException e){
+            }catch (Exception e){
                 plugin.getLogger().warning("reconnecting to Redis has Failed! retrying in 4 seconds!");
                 try { Thread.sleep(4000);}catch (InterruptedException ignored){}
             }
