@@ -61,6 +61,8 @@ public class AddonPlugin extends JavaPlugin {
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
+            assert sha != null;
+            key = sha.digest(key);
             key = Arrays.copyOf(key, 16);
             SecretKeySpec encryptionKey = new SecretKeySpec(key, "AES");
 
