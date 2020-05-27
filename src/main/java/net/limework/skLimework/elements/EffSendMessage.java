@@ -34,11 +34,16 @@ public class EffSendMessage extends Effect {
             Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aGBot&a] &cMessage Was empty Please check your code."));
             return;
         }
+        assert plugin != null;
         plugin.getJedisExecutionService().execute(() -> {
             Jedis j = plugin.getJedisPool().getResource();
             JSONObject json = new JSONObject();
             try {
-                json.put("Message", message);
+                if (plugin.isEncryptionEnabled()) {
+                    json.put("Message", plugin.encrypt(message));
+                } else {
+                    json.put("Message", message);
+                }
                 json.put("Type", "Skript");
                 j.publish(channel, json.toString());
                 //System.out.println("SkriptSide sent MESSAGE: ["+ message + "] to channel: " + channel + " and json: \n" + json.toString());

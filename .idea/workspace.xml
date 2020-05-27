@@ -7,11 +7,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="61139119-6327-48a6-9183-0df6346ed8d8" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/discord.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/AddonPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/AddonPlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/Events/RedisSub.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/Events/RedisSub.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/Events/onRedisMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/Events/onRedisMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/elements/EffSendMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/elements/EffSendMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config.yml" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -35,6 +37,10 @@
     </option>
   </component>
   <component name="ProjectId" id="1ZwZbhHZiGU2Gkz7zWjyRIlJngw" />
+  <component name="ProjectViewState">
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
     <property name="GenerateAntBuildDialog.backupFiles" value="true" />
     <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
@@ -51,18 +57,6 @@
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="net.limework.skLimework.elements" />
     </key>
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
   </component>
   <component name="RunManager">
     <configuration name="Tester" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -83,6 +77,9 @@
         <item itemvalue="Application.Tester" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="SQLPlugin.ProjectConfiguration">
+    <queries />
   </component>
   <component name="SvnConfiguration">
     <configuration />

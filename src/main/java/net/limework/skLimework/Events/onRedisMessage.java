@@ -1,5 +1,7 @@
 package net.limework.skLimework.Events;
 
+import net.limework.skLimework.AddonPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
@@ -13,7 +15,13 @@ public class onRedisMessage extends Event {
     onRedisMessage(String channelName , String message) {
         super(true);
         this.channelName = channelName;
-        this.message = message;
+        AddonPlugin instance = (AddonPlugin) Bukkit.getPluginManager().getPlugin("SKLimework");
+        assert instance != null;
+        if (instance.isEncryptionEnabled()) {
+            this.message = instance.decrypt(message);
+        } else {
+            this.message = message;
+        }
     }
 
 

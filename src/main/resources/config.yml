@@ -6,6 +6,9 @@ Redis:
   Port: 6379
   TimeOut: 40000
   useSSL: true
+  #useful if SSL is disabled
+  EncryptMessages: false
+  EncryptionKey: "16CHARACTERS KEY"
 
 Channels:
   - "Channel1"
