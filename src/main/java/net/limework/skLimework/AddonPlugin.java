@@ -40,7 +40,8 @@ public class AddonPlugin extends JavaPlugin {
     private JedisPool jedisPool;
     private RedisSub redisSub;
     private ExecutorService service;
-    private Cipher cipher;
+    private Cipher encryptionCipher;
+    private Cipher decryptionCipher;
     private boolean encryptionEnabled;
 
     @Override
@@ -66,14 +67,29 @@ public class AddonPlugin extends JavaPlugin {
             key = Arrays.copyOf(key, 16);
             SecretKeySpec encryptionKey = new SecretKeySpec(key, "AES");
 
-            cipher = null;
+            encryptionCipher = null;
             try {
-                cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
+                encryptionCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (NoSuchPaddingException e) {
                 e.printStackTrace();
             }
             try {
-                cipher.init(Cipher.ENCRYPT_MODE, encryptionKey);
+                encryptionCipher.init(Cipher.ENCRYPT_MODE, encryptionKey);
+            } catch (InvalidKeyException e) {
+                e.printStackTrace();
+            }
+            decryptionCipher = null;
+            try {
+                decryptionCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (NoSuchPaddingException e) {
+                e.printStackTrace();
+            }
+            try {
+                decryptionCipher.init(Cipher.DECRYPT_MODE, encryptionKey);
             } catch (InvalidKeyException e) {
                 e.printStackTrace();
             }
@@ -145,7 +161,7 @@ public class AddonPlugin extends JavaPlugin {
     public String encrypt(String message) {
         String encrypted = null;
         try {
-            encrypted = Base64.getEncoder().encodeToString(cipher.doFinal(message.getBytes(StandardCharsets.UTF_8)));
+            encrypted = Base64.getEncoder().encodeToString(encryptionCipher.doFinal(message.getBytes(StandardCharsets.UTF_8)));
         } catch (IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
         }
@@ -155,7 +171,7 @@ public class AddonPlugin extends JavaPlugin {
     public String decrypt(String message) {
         String decrypted = null;
         try {
-            decrypted = new String(cipher.doFinal(Base64.getDecoder().decode(message)), StandardCharsets.UTF_8);
+            decrypted = new String(decryptionCipher.doFinal(Base64.getDecoder().decode(message)), StandardCharsets.UTF_8);
         } catch (IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
         }

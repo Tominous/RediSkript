@@ -7,8 +7,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="61139119-6327-48a6-9183-0df6346ed8d8" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/SkLimework_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/SkLimework_jar.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkLimework.jar" beforeDir="false" afterPath="$PROJECT_DIR$/SkLimework.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/AddonPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/AddonPlugin.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
