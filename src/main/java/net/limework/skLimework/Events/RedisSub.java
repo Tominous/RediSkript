@@ -16,6 +16,7 @@ public class RedisSub extends JedisPubSub implements Runnable{
     private AddonPlugin plugin;
     private Jedis j;
     private String[] channels;
+    private Boolean isShuttingDown = false;
 
     public RedisSub(AddonPlugin plugin, Jedis j, List<String> channels) {
         this.plugin = plugin;
@@ -37,7 +38,7 @@ public class RedisSub extends JedisPubSub implements Runnable{
     private void newJedis() {
         //this.unsubscribe();
         this.j.close();
-        while (true){
+        while (!isShuttingDown){
             try {
                 plugin.getLogger().info("reconnecting to Redis!");
                 this.j = plugin.getJedisPool().getResource();
@@ -48,6 +49,7 @@ public class RedisSub extends JedisPubSub implements Runnable{
                 try { Thread.sleep(4000);}catch (InterruptedException ignored){}
             }
         }
+        if (isShuttingDown) return;
         plugin.getJedisExecutionService().execute(this);
     }
 
@@ -67,6 +69,7 @@ public class RedisSub extends JedisPubSub implements Runnable{
     }
 
     public void shutdown(){
+        isShuttingDown = true;
         this.unsubscribe();
         j.close();
     }
