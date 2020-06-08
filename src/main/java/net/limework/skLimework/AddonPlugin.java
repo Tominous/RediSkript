@@ -69,7 +69,7 @@ public class AddonPlugin extends JavaPlugin {
 
             encryptionCipher = null;
             try {
-                encryptionCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+                encryptionCipher = Cipher.getInstance("AES/SIV/PKCS5Padding");
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             } catch (NoSuchPaddingException e) {
@@ -82,7 +82,7 @@ public class AddonPlugin extends JavaPlugin {
             }
             decryptionCipher = null;
             try {
-                decryptionCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+                decryptionCipher = Cipher.getInstance("AES/SIV/PKCS5Padding");
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             } catch (NoSuchPaddingException e) {
