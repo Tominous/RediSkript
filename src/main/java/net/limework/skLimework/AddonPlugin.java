@@ -13,6 +13,8 @@ import net.limework.skLimework.elements.ExprMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.cryptomator.siv.SivMode;
+import org.cryptomator.siv.UnauthenticCiphertextException;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -40,9 +42,10 @@ public class AddonPlugin extends JavaPlugin {
     private JedisPool jedisPool;
     private RedisSub redisSub;
     private ExecutorService service;
-    private Cipher encryptionCipher;
-    private Cipher decryptionCipher;
     private boolean encryptionEnabled;
+    private String encryptionKey;
+    private String macKey;
+    private final SivMode AES_SIV = new SivMode();
 
     @Override
     public void onEnable(){
@@ -52,47 +55,8 @@ public class AddonPlugin extends JavaPlugin {
         encryptionEnabled = config.getBoolean("Redis.EncryptMessages");
         if (encryptionEnabled) {
             // AES-128 encryption
-            String configKey = config.getString("Redis.EncryptionKey");
-            byte[] key = null;
-            assert configKey != null;
-            key = configKey.getBytes(StandardCharsets.UTF_8);
-            MessageDigest sha = null;
-            try {
-                sha = MessageDigest.getInstance("SHA-1");
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            }
-            assert sha != null;
-            key = sha.digest(key);
-            key = Arrays.copyOf(key, 16);
-            SecretKeySpec encryptionKey = new SecretKeySpec(key, "AES");
-
-            encryptionCipher = null;
-            try {
-                encryptionCipher = Cipher.getInstance("AES/SIV/PKCS5Padding");
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (NoSuchPaddingException e) {
-                e.printStackTrace();
-            }
-            try {
-                encryptionCipher.init(Cipher.ENCRYPT_MODE, encryptionKey);
-            } catch (InvalidKeyException e) {
-                e.printStackTrace();
-            }
-            decryptionCipher = null;
-            try {
-                decryptionCipher = Cipher.getInstance("AES/SIV/PKCS5Padding");
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (NoSuchPaddingException e) {
-                e.printStackTrace();
-            }
-            try {
-                decryptionCipher.init(Cipher.DECRYPT_MODE, encryptionKey);
-            } catch (InvalidKeyException e) {
-                e.printStackTrace();
-            }
+            encryptionKey = config.getString("Redis.EncryptionKey");
+            macKey = config.getString("Redis.MacKey");
         }
         
         addon = Skript.registerAddon(this);
@@ -157,23 +121,11 @@ public class AddonPlugin extends JavaPlugin {
 
     public boolean isEncryptionEnabled() { return encryptionEnabled; }
 
-    public String encrypt(String message) {
-        String encrypted = null;
-        try {
-            encrypted = Base64.getEncoder().encodeToString(encryptionCipher.doFinal(message.getBytes(StandardCharsets.UTF_8)));
-        } catch (IllegalBlockSizeException | BadPaddingException e) {
-            e.printStackTrace();
-        }
-        return encrypted;
+    public String decrypt(byte[] message) throws UnauthenticCiphertextException, IllegalBlockSizeException {
+        return new String(AES_SIV.decrypt(encryptionKey.getBytes(), macKey.getBytes(), message), StandardCharsets.UTF_8);
     }
 
-    public String decrypt(String message) {
-        String decrypted = null;
-        try {
-            decrypted = new String(decryptionCipher.doFinal(Base64.getDecoder().decode(message)), StandardCharsets.UTF_8);
-        } catch (IllegalBlockSizeException | BadPaddingException e) {
-            e.printStackTrace();
-        }
-        return decrypted;
+    public byte[] encrypt(String message) {
+        return AES_SIV.encrypt(encryptionKey.getBytes(), macKey.getBytes(), message.getBytes());
     }
 }

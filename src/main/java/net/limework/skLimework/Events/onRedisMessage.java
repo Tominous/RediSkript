@@ -17,11 +17,7 @@ public class onRedisMessage extends Event {
         this.channelName = channelName;
         AddonPlugin instance = (AddonPlugin) Bukkit.getPluginManager().getPlugin("SKLimework");
         assert instance != null;
-        if (instance.isEncryptionEnabled()) {
-            this.message = instance.decrypt(message);
-        } else {
-            this.message = message;
-        }
+        this.message = message;
     }
 
 

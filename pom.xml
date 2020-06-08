@@ -87,5 +87,10 @@
         <artifactId>json</artifactId>
         <version>20190722</version>
     </dependency>
+    <dependency>
+        <groupId>org.cryptomator</groupId>
+        <artifactId>siv-mode</artifactId>
+        <version>1.4.0</version>
+    </dependency>
     </dependencies>
 </project>

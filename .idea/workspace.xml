@@ -7,9 +7,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="61139119-6327-48a6-9183-0df6346ed8d8" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/Govindas.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/SkLimework_jar.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/SkLimework_jar.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SkLimework.jar" beforeDir="false" afterPath="$PROJECT_DIR$/SkLimework.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/AddonPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/AddonPlugin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/Events/RedisSub.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/Events/RedisSub.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/Events/onRedisMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/Events/onRedisMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/elements/EffSendMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/limework/skLimework/elements/EffSendMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,10 +112,22 @@
     </option>
   </component>
   <component name="WindowStateProjectService">
-    <state x="163" y="0" key="SettingsEditor" timestamp="1590579862132">
+    <state x="488" y="73" key="#com.intellij.ide.util.MemberChooser" timestamp="1591617069198">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="163" y="0" key="SettingsEditor/0.0.1366.728@0.0.1366.728" timestamp="1590579862132" />
+    <state x="488" y="73" key="#com.intellij.ide.util.MemberChooser/0.0.1366.728@0.0.1366.728" timestamp="1591617069198" />
+    <state x="413" y="118" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog" timestamp="1591616099905">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="413" y="118" key="#com.intellij.util.ui.classpath.ChooseLibrariesDialog/0.0.1366.728@0.0.1366.728" timestamp="1591616099905" />
+    <state x="355" y="237" key="FileChooserDialogImpl" timestamp="1591616084452">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="355" y="237" key="FileChooserDialogImpl/0.0.1366.728@0.0.1366.728" timestamp="1591616084452" />
+    <state x="163" y="0" key="SettingsEditor" timestamp="1591616503146">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="163" y="0" key="SettingsEditor/0.0.1366.728@0.0.1366.728" timestamp="1591616503146" />
     <state x="346" y="49" width="672" height="678" key="search.everywhere.popup" timestamp="1590580687500">
       <screen x="0" y="0" width="1366" height="728" />
     </state>

@@ -11,8 +11,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.Event;
 import org.json.JSONObject;
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.BinaryJedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
+
+import java.nio.charset.StandardCharsets;
 
 public class EffSendMessage extends Effect {
 //"hi"
@@ -36,18 +38,19 @@ public class EffSendMessage extends Effect {
         }
         assert plugin != null;
         plugin.getJedisExecutionService().execute(() -> {
-            Jedis j = plugin.getJedisPool().getResource();
+            BinaryJedis j = plugin.getJedisPool().getResource();
             JSONObject json = new JSONObject();
-            try {
-                if (plugin.isEncryptionEnabled()) {
-                    json.put("Message", plugin.encrypt(message));
-                } else {
-                    json.put("Message", message);
-                }
-                json.put("Type", "Skript");
-                j.publish(channel, json.toString());
-                //System.out.println("SkriptSide sent MESSAGE: ["+ message + "] to channel: " + channel + " and json: \n" + json.toString());
-            }catch (Exception e){e.printStackTrace();}
+            json.put("Message", message);
+            json.put("Type", "Skript");
+            json.put("Date", System.nanoTime()); //for unique string every time & PING calculations
+            byte[] msg;
+            if (plugin.isEncryptionEnabled()) {
+                msg = plugin.encrypt(json.toString());
+            } else {
+                msg = message.getBytes(StandardCharsets.UTF_8);
+            }
+            j.publish(channel.getBytes(), msg);
+            //System.out.println("SkriptSide sent MESSAGE: ["+ message + "] to channel: " + channel + " and json: \n" + json.toString());
             j.close();
         });
 

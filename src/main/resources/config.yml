@@ -9,6 +9,7 @@ Redis:
   #useful if SSL is disabled
   EncryptMessages: false
   EncryptionKey: "16CHARACTERS KEY"
+  MacKey: "16CHARACTERS KEY"
 
 Channels:
   - "Channel1"
