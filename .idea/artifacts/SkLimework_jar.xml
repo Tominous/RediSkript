@@ -1,13 +1,12 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="SkLimework:jar">
-    <output-path>$PROJECT_DIR$</output-path>
+  <artifact type="jar" name="SkLimework:jar">
+    <output-path>$PROJECT_DIR$/../FallBack/plugins</output-path>
     <root id="archive" name="SkLimework.jar">
       <element id="module-output" name="SkLimework" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.8.6/gson-2.8.6.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-pool2/2.6.2/commons-pool2-2.6.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/json/json/20190722/json-20190722.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/cryptomator/siv-mode/1.4.0/siv-mode-1.4.0.jar" path-in-jar="/" />
       <element id="directory" name="sourcecode">
         <element id="module-source" name="SkLimework" />
       </element>
