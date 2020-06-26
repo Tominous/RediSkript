@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class RedisSub extends BinaryJedisPubSub implements Runnable{
+public class RedisSub extends BinaryJedisPubSub implements Runnable {
 
     private AddonPlugin plugin;
     private BinaryJedis j;
@@ -29,20 +29,35 @@ public class RedisSub extends BinaryJedisPubSub implements Runnable{
     }
 
     @Override
-    public void run(){
-        while (!isShuttingDown.get()){
+    public void run() {
+        while (!isShuttingDown.get()) {
             try {
                 message("&e[Jedis] &cConnecting to redis...........");
                 if (!this.j.isConnected()) this.j = plugin.getJedisPool().getResource();
                 isRedisOnline.set(true);
                 message("&e[Jedis] &aRedis Connected");
-                this.j.subscribe(this,
-                        channels.get(0).getBytes(),
-                        channels.get(1).getBytes(),
-                        channels.get(2).getBytes(),
-                        channels.get(3).getBytes(),
-                        channels.get(4).getBytes());
-            } catch (Exception e){
+                int byteArr2dSize = 1;
+                byte[][] channelsInByte = new byte[channels.size()][byteArr2dSize];
+                boolean reInitializeByteArray;
+
+                // Loop that reInitialize array IF array size is not enough
+                do {
+                    reInitializeByteArray = false;
+                    try {
+                        /* Data Initialization for channelsInByte array from List<String> channels */
+                        for (int x = 0; x < channels.size(); x++) {
+                            channelsInByte[x] = channels.get(x).getBytes();
+                        }
+                    } catch (ArrayIndexOutOfBoundsException ex) {
+                        reInitializeByteArray = true;
+                        /* Increase the current 2d array size to increase 1 and reinitialize the array*/
+                        byteArr2dSize += 1;
+                        channelsInByte = new byte[channels.size()][byteArr2dSize];
+                    }
+                } while (reInitializeByteArray);
+                this.j.subscribe(this, channelsInByte);
+                
+            } catch (Exception e) {
                 message("&e[Jedis] &cConnection to redis has failed! &ereconnecting...");
                 this.j.close();
                 isRedisOnline.set(false);
@@ -55,7 +70,7 @@ public class RedisSub extends BinaryJedisPubSub implements Runnable{
         }
     }
 
-    private void message(String message){
+    private void message(String message) {
         plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', message));
     }
 
@@ -77,12 +92,12 @@ public class RedisSub extends BinaryJedisPubSub implements Runnable{
             plugin.getServer().getPluginManager().callEvent(new onRedisMessage(channelString, j.getString("Message")));
         } catch (Exception e) {
             e.printStackTrace();
-            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aGBot&a] &cI Got a Message that Was empty from channel "+ channel +" Please check your code that you used to send the message. ^ ignore the error."));
+            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aGBot&a] &cI Got a Message that Was empty from channel " + channel + " Please check your code that you used to send the message. ^ ignore the error."));
         }
 
     }
 
-    public void shutdown(){
+    public void shutdown() {
         this.isShuttingDown.set(true);
         this.unsubscribe();
         j.close();

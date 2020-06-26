@@ -62,7 +62,7 @@ public class AddonPlugin extends JavaPlugin {
         addon = Skript.registerAddon(this);
         try { addon.loadClasses("net.limework.skLimework", "elements");
             Skript.registerEvent("redis message", EvtRedis.class, onRedisMessage.class, "redis message");
-            Skript.registerExpression(ExprChannel.class, String.class, ExpressionType.SIMPLE, "channel");
+            Skript.registerExpression(ExprChannel.class, String.class, ExpressionType.SIMPLE, "redis channel");
             EventValues.registerEventValue(onRedisMessage.class, String.class, new Getter<String, onRedisMessage>() {
                 @Override
                 public String get(onRedisMessage e) {
