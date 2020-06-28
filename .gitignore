@@ -1,7 +1,5 @@
 target
 out
-.idea/workspace.xml
-.idea/libraries
+.idea
 compile
-.idea/artifacts
 *.iml
