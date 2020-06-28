@@ -34,7 +34,7 @@ public class LimeworkSpigotCore extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
+        rm.shutdown();
     }
 
     private void loadSkript() {
@@ -64,7 +64,7 @@ public class LimeworkSpigotCore extends JavaPlugin {
 
 
     }
-    
+
     public RedisManager getRm() {
         return rm;
     }
