@@ -1,31 +1,64 @@
-package net.limework.skLimework.Events;
+package net.limework.core.Managers;
 
-import net.limework.skLimework.AddonPlugin;
+import net.limework.Data.Encryption;
+import net.limework.core.LimeworkSpigotCore;
+import net.limework.core.events.RedisMessageEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.Configuration;
 import org.cryptomator.siv.UnauthenticCiphertextException;
 import org.json.JSONObject;
 import redis.clients.jedis.BinaryJedis;
 import redis.clients.jedis.BinaryJedisPubSub;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 import javax.crypto.IllegalBlockSizeException;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+public class RedisManager extends BinaryJedisPubSub implements Runnable{
 
-public class RedisSub extends BinaryJedisPubSub implements Runnable {
+    private LimeworkSpigotCore plugin;
 
-    private AddonPlugin plugin;
-    private BinaryJedis j;
+    private JedisPool jedisPool;
+    private ExecutorService RedisService;
+
+
+
+    //sub
+    private BinaryJedis subscribeJedis;
     private List<String> channels;
     private AtomicBoolean isShuttingDown = new AtomicBoolean(false);
     private AtomicBoolean isRedisOnline = new AtomicBoolean();
+    private Encryption encryption;
 
 
-    public RedisSub(AddonPlugin plugin, BinaryJedis j, List<String> channels) {
+    public RedisManager(LimeworkSpigotCore plugin) {
         this.plugin = plugin;
-        this.j = j;
-        this.channels = channels;
+        Configuration config = this.plugin.getConfig();
+        JedisPoolConfig JConfig = new JedisPoolConfig();
+        JConfig.setMaxTotal(config.getInt("Redis.MaxConnections"));
+        JConfig.setMaxIdle(config.getInt("Redis.MaxConnections"));
+        JConfig.setMinIdle(1);
+        JConfig.setBlockWhenExhausted(true);
+        this.jedisPool = new JedisPool(JConfig,
+                config.getString("Redis.Host"),
+                config.getInt("Redis.Port"),
+                config.getInt("Redis.TimeOut"),
+                config.getString("Redis.Password"),
+                config.getBoolean("Redis.useSSL"));
+        RedisService = Executors.newFixedThreadPool(config.getInt("Redis.Threads"));
+        this.subscribeJedis = this.jedisPool.getResource();
+        this.channels = config.getStringList("Channels");
+        encryption = new Encryption(config);
+
+    }
+
+    public void start(){
+        this.RedisService.execute(this);
     }
 
     @Override
@@ -33,7 +66,7 @@ public class RedisSub extends BinaryJedisPubSub implements Runnable {
         while (!isShuttingDown.get()) {
             try {
                 message("&e[Jedis] &cConnecting to redis...........");
-                if (!this.j.isConnected()) this.j = plugin.getJedisPool().getResource();
+                if (!this.subscribeJedis.isConnected()) this.subscribeJedis = this.jedisPool.getResource();
                 isRedisOnline.set(true);
                 message("&e[Jedis] &aRedis Connected");
                 int byteArr2dSize = 1;
@@ -55,11 +88,11 @@ public class RedisSub extends BinaryJedisPubSub implements Runnable {
                         channelsInByte = new byte[channels.size()][byteArr2dSize];
                     }
                 } while (reInitializeByteArray);
-                this.j.subscribe(this, channelsInByte);
-                
+                this.subscribeJedis.subscribe(this, channelsInByte);
+
             } catch (Exception e) {
                 message("&e[Jedis] &cConnection to redis has failed! &ereconnecting...");
-                this.j.close();
+                this.subscribeJedis.close();
                 isRedisOnline.set(false);
             }
             try {
@@ -76,20 +109,18 @@ public class RedisSub extends BinaryJedisPubSub implements Runnable {
 
     @Override
     public void onMessage(byte[] channel, byte[] message) {
-        AddonPlugin plugin = (AddonPlugin) Bukkit.getPluginManager().getPlugin("SKLimework");
         String channelString = new String(channel);
         try {
             String decrypted = null;
             try {
-                assert plugin != null;
-                decrypted = plugin.decrypt(message);
+                decrypted = encryption.decrypt(message);
             } catch (UnauthenticCiphertextException | IllegalBlockSizeException e) {
                 e.printStackTrace();
             }
             assert decrypted != null;
             JSONObject j = new JSONObject(decrypted);
             //System.out.println("Message got from channel: "+channel +" and the Message: " +json.toString());
-            plugin.getServer().getPluginManager().callEvent(new onRedisMessage(channelString, j.getString("Message")));
+            plugin.getServer().getPluginManager().callEvent(new RedisMessageEvent(channelString, j.getString("Message")));
         } catch (Exception e) {
             e.printStackTrace();
             Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aGBot&a] &cI Got a Message that Was empty from channel " + channel + " Please check your code that you used to send the message. ^ ignore the error."));
@@ -100,11 +131,31 @@ public class RedisSub extends BinaryJedisPubSub implements Runnable {
     public void shutdown() {
         this.isShuttingDown.set(true);
         this.unsubscribe();
-        j.close();
+        this.RedisService.shutdown();
+        subscribeJedis.close();
     }
 
     public boolean IsRedisOnline() {
         return isRedisOnline.get();
     }
 
+    public JedisPool getJedisPool() {
+        return jedisPool;
+    }
+
+    public ExecutorService getRedisService() {
+        return RedisService;
+    }
+
+    public AtomicBoolean getIsShuttingDown() {
+        return isShuttingDown;
+    }
+
+    public AtomicBoolean getIsRedisOnline() {
+        return isRedisOnline;
+    }
+
+    public Encryption getEncryption() {
+        return encryption;
+    }
 }

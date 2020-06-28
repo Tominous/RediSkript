@@ -1,18 +1,18 @@
-package net.limework.skLimework.Events;
+package net.limework.core.events;
 
 import net.limework.skLimework.AddonPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-
-public class onRedisMessage extends Event {
+@SuppressWarnings("unused")
+public class RedisMessageEvent extends Event {
     private final static HandlerList HANDLERS = new HandlerList();
 
     private String channelName;
     private String message;
 
-    onRedisMessage(String channelName , String message) {
+    public RedisMessageEvent(String channelName , String message) {
         super(true);
         this.channelName = channelName;
         AddonPlugin instance = (AddonPlugin) Bukkit.getPluginManager().getPlugin("SKLimework");

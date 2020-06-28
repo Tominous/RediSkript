@@ -5,7 +5,7 @@ Redis:
   Threads: 10
   Port: 6379
   TimeOut: 40000
-  useSSL: true
+  useSSL: FALSE
   #useful if SSL is disabled
   EncryptMessages: false
   EncryptionKey: "16CHARACTERS KEY"

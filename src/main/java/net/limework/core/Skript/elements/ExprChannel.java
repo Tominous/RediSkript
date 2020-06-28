@@ -1,11 +1,11 @@
-package net.limework.skLimework.elements;
+package net.limework.core.Skript.elements;
 
 
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
-import net.limework.skLimework.Events.onRedisMessage;
+import net.limework.core.events.RedisMessageEvent;
 import org.bukkit.event.Event;
 
 public class ExprChannel extends SimpleExpression<String> {
@@ -34,8 +34,8 @@ public class ExprChannel extends SimpleExpression<String> {
 
     @Override
     protected String[] get(Event e) {
-        if (e instanceof onRedisMessage){
-            return new String[]{((onRedisMessage) e).getChannelName()};
+        if (e instanceof RedisMessageEvent){
+            return new String[]{((RedisMessageEvent) e).getChannelName()};
         }
         return null;
     }
