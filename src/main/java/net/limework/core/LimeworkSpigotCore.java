@@ -5,6 +5,7 @@ import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Getter;
+import net.limework.core.guis.TestGui;
 import net.limework.core.managers.RedisManager;
 import net.limework.core.skript.elements.EvtRedis;
 import net.limework.core.skript.elements.ExprChannel;
@@ -27,9 +28,7 @@ public class LimeworkSpigotCore extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         rm = new RedisManager(this);
-
-
-        loadSkript();
+        try  {loadSkript();} catch (Exception e){ this.getLogger().info("Skript wasn't found."); }
         rm.start();
     }
 
