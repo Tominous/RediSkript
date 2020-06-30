@@ -1,4 +1,4 @@
-package net.limework.core.Managers;
+package net.limework.core.managers;
 
 import net.limework.Data.Encryption;
 import net.limework.core.LimeworkSpigotCore;

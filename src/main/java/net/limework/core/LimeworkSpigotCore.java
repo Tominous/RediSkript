@@ -5,9 +5,10 @@ import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Getter;
-import net.limework.core.Managers.RedisManager;
-import net.limework.core.Skript.elements.EvtRedis;
-import net.limework.core.Skript.elements.ExprChannel;
+import net.limework.core.managers.RedisManager;
+import net.limework.core.skript.elements.EvtRedis;
+import net.limework.core.skript.elements.ExprChannel;
+import net.limework.core.skript.elements.ExprMessage;
 import net.limework.core.events.RedisMessageEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -49,7 +50,7 @@ public class LimeworkSpigotCore extends JavaPlugin {
                     return e.getChannelName();
                 }
             }, 0);
-            Skript.registerExpression(net.limework.skLimework.elements.ExprMessage.class, String.class, ExpressionType.SIMPLE, "redis message");
+            Skript.registerExpression(ExprMessage.class, String.class, ExpressionType.SIMPLE, "redis message");
             EventValues.registerEventValue(RedisMessageEvent.class, String.class, new Getter<String, RedisMessageEvent>() {
                 @Override
                 public String get(RedisMessageEvent e) {
@@ -64,6 +65,8 @@ public class LimeworkSpigotCore extends JavaPlugin {
 
 
     }
+
+
 
     public RedisManager getRm() {
         return rm;

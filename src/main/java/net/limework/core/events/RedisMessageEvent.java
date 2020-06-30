@@ -1,6 +1,5 @@
 package net.limework.core.events;
 
-import net.limework.skLimework.AddonPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -15,8 +14,6 @@ public class RedisMessageEvent extends Event {
     public RedisMessageEvent(String channelName , String message) {
         super(true);
         this.channelName = channelName;
-        AddonPlugin instance = (AddonPlugin) Bukkit.getPluginManager().getPlugin("SKLimework");
-        assert instance != null;
         this.message = message;
     }
 

@@ -1,4 +1,4 @@
-package net.limework.core.Skript.elements;
+package net.limework.core.skript.elements;
 
 
 import ch.njol.skript.lang.Expression;

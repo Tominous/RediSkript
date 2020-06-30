@@ -1,6 +1,6 @@
-main: net.limework.skLimework.AddonPlugin
-name: SKLimework
-version: 1.0
+main: net.limework.core.LimeworkSpigotCore
+name: LimeworkSpigotCore
+version: 1.0.0
 author: limework.net
-depend:
+softdepend:
   - Skript
