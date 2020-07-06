@@ -1,5 +1,6 @@
-package net.limework.core.usefulstuff;
+package net.limework.core.abstraction;
 
+import ch.njol.skript.Skript;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -20,7 +21,7 @@ public abstract class Gui {
 
 
     protected void setup(String name, int rows) {
-        if (loaded){
+        if (loaded) {
             return;
         }
         loaded = true;
@@ -30,26 +31,36 @@ public abstract class Gui {
     }
 
 
-    protected void makeItem(int slot, Material material, String name, String... prelore) {
+    protected void makeItem(Material material, int howMany, int slot,  String name) {
         ItemStack item = new ItemStack(material, 1);
         ItemMeta item_meta = item.getItemMeta();
         item_meta.setDisplayName(translateAlternateColorCodes('&', name));
-        List<String> lore = new ArrayList<String>();
-        for (String s : prelore) {
+        item.setItemMeta(item_meta);
+        item.setAmount(howMany);
+        this.gui.clear(slot);
+        this.gui.setItem(slot, item);
+    }
 
+    protected void makeItem(Material material, int howMany, int slot,  String name, String... Lore) {
+        ItemStack item = new ItemStack(material, 1);
+        ItemMeta item_meta = item.getItemMeta();
+        item_meta.setDisplayName(translateAlternateColorCodes('&', name));
+        List<String> lore = new ArrayList<>();
+        for (String s : Lore) {
             lore.add(translateAlternateColorCodes('&', s));
         }
         item_meta.setLore(lore);
         item.setItemMeta(item_meta);
+        item.setAmount(howMany);
         this.gui.clear(slot);
         this.gui.setItem(slot, item);
     }
 
     protected void fillGUI(Material material) {
-        int x = -1;
-        while (x <= (this.rows - 2)) {
-            x++;
-            makeItem(x, material, "&1.", "");
+        int slot = -1;
+        while (slot <= (this.rows - 2)) {
+            slot++;
+            makeItem(material, 1, slot , "&1.", "");
         }
 
     }

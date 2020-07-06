@@ -51,7 +51,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable{
                 config.getString("Redis.Password"),
                 config.getBoolean("Redis.useSSL"));
         RedisService = Executors.newFixedThreadPool(config.getInt("Redis.Threads"));
-        this.subscribeJedis = this.jedisPool.getResource();
+        try{this.subscribeJedis = this.jedisPool.getResource(); }catch (Exception ignored){}
         this.channels = config.getStringList("Channels");
         encryption = new Encryption(config);
 
@@ -92,7 +92,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable{
 
             } catch (Exception e) {
                 message("&e[Jedis] &cConnection to redis has failed! &ereconnecting...");
-                this.subscribeJedis.close();
+                if (this.subscribeJedis != null){this.subscribeJedis.close();}
                 isRedisOnline.set(false);
             }
             try {
@@ -130,9 +130,12 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable{
 
     public void shutdown() {
         this.isShuttingDown.set(true);
-        this.unsubscribe();
+        if (this.subscribeJedis != null){
+            this.unsubscribe();
+            this.subscribeJedis.close();
+        }
         this.RedisService.shutdown();
-        subscribeJedis.close();
+
     }
 
     public boolean IsRedisOnline() {

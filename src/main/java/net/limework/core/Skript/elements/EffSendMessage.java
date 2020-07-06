@@ -27,7 +27,7 @@ public class EffSendMessage extends Effect {
 
     @Override
     protected void execute(Event event) {
-        LimeworkSpigotCore plugin = (LimeworkSpigotCore) Bukkit.getPluginManager().getPlugin("SKLimework");
+        LimeworkSpigotCore plugin = (LimeworkSpigotCore) Bukkit.getPluginManager().getPlugin("LimeworkSpigotCore");
         String message = this.message.getSingle(event);
         String channel = this.channel.getSingle(event);
         if (message == null) {//checks if message equals null if true does not execute.
