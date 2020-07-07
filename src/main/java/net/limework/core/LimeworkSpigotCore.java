@@ -2,6 +2,7 @@ package net.limework.core;
 
 import net.limework.core.guis.ControlGui;
 import net.limework.core.hooks.SkriptHook;
+import net.limework.core.managers.DataSourcesManager;
 import net.limework.core.managers.RedisManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -9,6 +10,9 @@ public class LimeworkSpigotCore extends JavaPlugin {
 
     //Redis manager
     private RedisManager rm;
+
+    //data
+    private DataSourcesManager dsm;
 
 
     @Override
@@ -29,6 +33,9 @@ public class LimeworkSpigotCore extends JavaPlugin {
             getLogger().info("SOMETHING WENT WRONG WHEN LOADING control gui.");
             e.printStackTrace();
         }
+        dsm = new DataSourcesManager(this);
+
+
 
 
     }
@@ -36,10 +43,15 @@ public class LimeworkSpigotCore extends JavaPlugin {
     @Override
     public void onDisable() {
         rm.shutdown();
+        dsm.shutdown();
     }
 
 
     public RedisManager getRm() {
         return rm;
+    }
+
+    public DataSourcesManager getDsm() {
+        return dsm;
     }
 }

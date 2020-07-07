@@ -15,3 +15,7 @@ Channels:
   - "Channel1"
   - "Channel2"
   - "Channel3"
+
+Mongodb:
+  enabled: false
+  url: ""
