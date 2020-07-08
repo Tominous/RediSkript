@@ -13,7 +13,7 @@ public class DataSourcesManager {
     public DataSourcesManager(LimeworkSpigotCore plugin) {
         Configuration config = plugin .getConfig();
         if (config.getBoolean("Mongodb.enabled")){
-            mongoClient = MongoClients.create();
+            mongoClient = MongoClients.create(config.getString("Mongodb.url"));
         }
     }
 
