@@ -179,6 +179,14 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
                     , "&c&lYou can not execute this command!!!!!!")));
             return true;
         }
+        try {
+            if (this.subscribeJedis != null) {
+                this.unsubscribe();
+                this.subscribeJedis.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         start();
         return false;
     }
