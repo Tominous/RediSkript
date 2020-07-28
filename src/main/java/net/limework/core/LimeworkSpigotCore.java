@@ -19,6 +19,7 @@ public class LimeworkSpigotCore extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         rm = new RedisManager(this);
+        getServer().getPluginCommand("reloadredis").setExecutor(rm);
         if (getServer().getPluginManager().getPlugin("Skript") != null) {
             new SkriptHook(this);
         } else {

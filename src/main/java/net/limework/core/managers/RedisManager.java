@@ -3,10 +3,16 @@ package net.limework.core.managers;
 import net.limework.Data.Encryption;
 import net.limework.core.LimeworkSpigotCore;
 import net.limework.core.events.RedisMessageEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.entity.Player;
 import org.cryptomator.siv.UnauthenticCiphertextException;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import redis.clients.jedis.BinaryJedis;
 import redis.clients.jedis.BinaryJedisPubSub;
@@ -19,13 +25,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class RedisManager extends BinaryJedisPubSub implements Runnable{
+public class RedisManager extends BinaryJedisPubSub implements Runnable, CommandExecutor {
 
     private LimeworkSpigotCore plugin;
 
     private JedisPool jedisPool;
     private ExecutorService RedisService;
-
 
 
     //sub
@@ -51,13 +56,16 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable{
                 config.getString("Redis.Password"),
                 config.getBoolean("Redis.useSSL"));
         RedisService = Executors.newFixedThreadPool(config.getInt("Redis.Threads"));
-        try{this.subscribeJedis = this.jedisPool.getResource(); }catch (Exception ignored){}
+        try {
+            this.subscribeJedis = this.jedisPool.getResource();
+        } catch (Exception ignored) {
+        }
         this.channels = config.getStringList("Channels");
         encryption = new Encryption(config);
 
     }
 
-    public void start(){
+    public void start() {
         this.RedisService.execute(this);
     }
 
@@ -92,7 +100,9 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable{
 
             } catch (Exception e) {
                 message("&e[Jedis] &cConnection to redis has failed! &ereconnecting...");
-                if (this.subscribeJedis != null){this.subscribeJedis.close();}
+                if (this.subscribeJedis != null) {
+                    this.subscribeJedis.close();
+                }
                 isRedisOnline.set(false);
             }
             try {
@@ -130,7 +140,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable{
 
     public void shutdown() {
         this.isShuttingDown.set(true);
-        if (this.subscribeJedis != null){
+        if (this.subscribeJedis != null) {
             this.unsubscribe();
             this.subscribeJedis.close();
         }
@@ -160,5 +170,16 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable{
 
     public Encryption getEncryption() {
         return encryption;
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String lable, String[] args) {
+        if (sender instanceof Player) {
+            sender.sendMessage(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&'
+                    , "&c&lYou can not execute this command!!!!!!")));
+            return true;
+        }
+        start();
+        return false;
     }
 }

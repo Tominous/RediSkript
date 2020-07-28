@@ -9,3 +9,6 @@ commands:
   control:
     description: "server control"
     permission: "admin.use"
+  reloadredis:
+    description: "server control"
+    permission: "admin.use"
