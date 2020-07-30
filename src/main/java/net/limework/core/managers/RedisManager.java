@@ -32,6 +32,8 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
     private JedisPool jedisPool;
     private ExecutorService RedisService;
 
+    private AtomicBoolean isKilled = new AtomicBoolean();
+
 
     //sub
     private BinaryJedis subscribeJedis;
@@ -72,6 +74,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
     @Override
     public void run() {
         while (!isShuttingDown.get()) {
+            isKilled.set(false);
             try {
                 message("&e[Jedis] &cConnecting to redis...........");
                 if (!this.subscribeJedis.isConnected()) this.subscribeJedis = this.jedisPool.getResource();
@@ -110,6 +113,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            if (isKilled.get()) break;
         }
     }
 
@@ -179,6 +183,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
                     , "&c&lYou can not execute this command!!!!!!")));
             return true;
         }
+        isKilled.set(true);
         try {
             if (this.subscribeJedis != null) {
                 this.unsubscribe();

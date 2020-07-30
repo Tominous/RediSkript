@@ -6,7 +6,7 @@
 
     <groupId>net.limework.core</groupId>
     <artifactId>LimeworkSpigotCore</artifactId>
-    <version>1.0.3-fix1-SNAPSHOT</version>
+    <version>1.0.3-fix2-SNAPSHOT</version>
     <packaging>jar</packaging>
 	
     <build>
