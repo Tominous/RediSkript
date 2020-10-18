@@ -112,10 +112,5 @@
             <version>19.0.0</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongodb-driver-sync</artifactId>
-            <version>4.0.4</version>
-        </dependency>
     </dependencies>
 </project>

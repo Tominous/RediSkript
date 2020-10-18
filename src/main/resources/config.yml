@@ -4,10 +4,11 @@ Redis:
   MaxConnections: 20
   Threads: 10
   Port: 6379
-  TimeOut: 40000
+  TimeOut: 90000
   useSSL: false
   #useful if SSL is disabled
-  EncryptMessages: false
+  #also currently EncryptMessages is broken, meaning it must always be true or else it won't work
+  EncryptMessages: true
   EncryptionKey: "16CHARACTERS KEY"
   MacKey: "16CHARACTERS KEY"
 
@@ -15,7 +16,3 @@ Channels:
   - "Channel1"
   - "Channel2"
   - "Channel3"
-
-Mongodb:
-  enabled: false
-  url: ""
