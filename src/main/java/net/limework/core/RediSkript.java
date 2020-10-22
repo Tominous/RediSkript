@@ -5,7 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 
-public class LimeworkSpigotCore extends JavaPlugin {
+public class RediSkript extends JavaPlugin {
 
     //Redis manager
     private RedisManager rm;

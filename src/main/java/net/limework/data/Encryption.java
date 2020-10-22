@@ -26,11 +26,11 @@ public class Encryption {
     public boolean isEncryptionEnabled() { return encryptionEnabled; }
 
     public String decrypt(byte[] message) throws UnauthenticCiphertextException, IllegalBlockSizeException {
-        return new String(AES_SIV.decrypt(encryptionKey.getBytes(), macKey.getBytes(), message), StandardCharsets.UTF_8);
+        return new String(AES_SIV.decrypt(encryptionKey.getBytes(StandardCharsets.UTF_8), macKey.getBytes(StandardCharsets.UTF_8), message), StandardCharsets.UTF_8);
     }
 
     public byte[] encrypt(String message) {
-        return AES_SIV.encrypt(encryptionKey.getBytes(), macKey.getBytes(), message.getBytes());
+        return AES_SIV.encrypt(encryptionKey.getBytes(StandardCharsets.UTF_8), macKey.getBytes(StandardCharsets.UTF_8), message.getBytes(StandardCharsets.UTF_8));
     }
 
 

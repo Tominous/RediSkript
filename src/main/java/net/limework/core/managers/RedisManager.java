@@ -1,7 +1,7 @@
 package net.limework.core.managers;
 
+import net.limework.core.RediSkript;
 import net.limework.data.Encryption;
-import net.limework.core.LimeworkSpigotCore;
 import net.limework.core.events.RedisMessageEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RedisManager extends BinaryJedisPubSub implements Runnable, CommandExecutor {
 
-    private LimeworkSpigotCore plugin;
+    private RediSkript plugin;
 
     private JedisPool jedisPool;
     private ExecutorService RedisService;
@@ -43,7 +43,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
     private Encryption encryption;
 
 
-    public RedisManager(LimeworkSpigotCore plugin) {
+    public RedisManager(RediSkript plugin) {
         this.plugin = plugin;
         Configuration config = this.plugin.getConfig();
         JedisPoolConfig JConfig = new JedisPoolConfig();
@@ -123,7 +123,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
 
     @Override
     public void onMessage(byte[] channel, byte[] message) {
-        String channelString = new String(channel);
+        String channelString = new String(channel, StandardCharsets.UTF_8);
         try {
             String receivedMessage = null;
             //if encryption is enabled, decrypt the message, else just convert binary to string
@@ -137,6 +137,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
             } else {
                 //encryption is disabled, so let's just get the string
                 receivedMessage = new String(message, StandardCharsets.UTF_8);
+                System.out.println(receivedMessage);
             }
 
             if (receivedMessage != null) {
@@ -146,7 +147,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRedisk&a] &cI got a message that was empty from channel " + channel + " please check your code that you used to send the message. ^ ignore the error."));
+            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRedisk&a] &cI got a message that was empty from channel " + channelString + " please check your code that you used to send the message. ^ ignore the error."));
         }
 
     }

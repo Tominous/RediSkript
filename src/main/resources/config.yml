@@ -14,7 +14,6 @@ Redis:
   useSSL: false
   #may be useful if you cannot use SSL due to use of older version of Redis
   #however this will not encrypt the initial authentication password, only the messages sent
-  #also currently EncryptMessages is broken, meaning it must always be true or else it won't work
   EncryptMessages: true
   EncryptionKey: "16CHARACTERS KEY"
   MacKey: "16CHARACTERS KEY"

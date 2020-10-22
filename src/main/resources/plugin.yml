@@ -1,7 +1,7 @@
-main: net.limework.core.LimeworkSpigotCore
-name: LimeworkSpigotCore
+main: net.limework.core.Redisk
+name: Redisk
 version: ${project.version}
-author: limework.net
+authors: [Govindas, ham1255, DaemonicKing]
 api-version: 1.13
 softdepend:
   - Skript

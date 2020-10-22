@@ -5,7 +5,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import net.limework.core.LimeworkSpigotCore;
+import net.limework.core.RediSkript;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.Event;
@@ -15,7 +15,6 @@ import redis.clients.jedis.BinaryJedis;
 import java.nio.charset.StandardCharsets;
 
 public class EffSendMessage extends Effect {
-    //"hi"
     static {
         Skript.registerEffect(EffSendMessage.class, "send redis message to channel %string% with message %string%");
     }
@@ -27,7 +26,7 @@ public class EffSendMessage extends Effect {
 
     @Override
     protected void execute(Event event) {
-        LimeworkSpigotCore plugin = (LimeworkSpigotCore) Bukkit.getPluginManager().getPlugin("LimeworkSpigotCore");
+        RediSkript plugin = (RediSkript) Bukkit.getPluginManager().getPlugin("RediSkript");
         String message = this.message.getSingle(event);
         String channel = this.channel.getSingle(event);
         if (message == null) {//checks if message equals null if true does not execute.
@@ -40,15 +39,14 @@ public class EffSendMessage extends Effect {
             JSONObject json = new JSONObject();
             json.put("Message", message);
             json.put("Type", "Skript");
-            json.put("Date", System.nanoTime()); //for unique string every time & PING calculations
+            json.put("Date", System.currentTimeMillis()); //for unique string every time & PING calculations
             byte[] msg;
             if (plugin.getRm().getEncryption().isEncryptionEnabled()) {
                 msg = plugin.getRm().getEncryption().encrypt(json.toString());
             } else {
-                msg = message.getBytes(StandardCharsets.UTF_8);
+                msg = json.toString().getBytes(StandardCharsets.UTF_8);
             }
-            j.publish(channel.getBytes(), msg);
-            //System.out.println("SkriptSide sent MESSAGE: ["+ message + "] to channel: " + channel + " and json: \n" + json.toString());
+            j.publish(channel.getBytes(StandardCharsets.UTF_8), msg);
             j.close();
         });
 
@@ -56,7 +54,7 @@ public class EffSendMessage extends Effect {
 
     @Override
     public String toString(Event event, boolean b) {
-        return null;
+        return "send redis message to channel " + channel.getSingle(event) + " with message " + message.getSingle(event);
     }
 
     @SuppressWarnings("unchecked")

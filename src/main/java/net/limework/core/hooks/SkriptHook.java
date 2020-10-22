@@ -5,7 +5,7 @@ import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Getter;
-import net.limework.core.LimeworkSpigotCore;
+import net.limework.core.RediSkript;
 import net.limework.core.events.RedisMessageEvent;
 import net.limework.core.skript.elements.EvtRedis;
 import net.limework.core.skript.elements.ExprChannel;
@@ -16,7 +16,7 @@ import java.io.IOException;
 public class SkriptHook {
 
     private SkriptAddon addon;
-    public SkriptHook(LimeworkSpigotCore plugin) {
+    public SkriptHook(RediSkript plugin) {
         addon = Skript.registerAddon(plugin);
         try {
             addon.loadClasses("net.limework.core.skript", "elements");
