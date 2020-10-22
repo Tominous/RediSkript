@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.limework.core</groupId>
-    <artifactId>LimeworkSpigotCore</artifactId>
-    <version>1.0.3-fix2-SNAPSHOT</version>
+    <artifactId>RediSkript</artifactId>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 	
     <build>
@@ -83,7 +83,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.16.1-R0.1-SNAPSHOT</version>
+            <version>1.16.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     <dependency>

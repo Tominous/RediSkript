@@ -1,5 +1,5 @@
-main: net.limework.core.Redisk
-name: Redisk
+main: net.limework.core.RediSkript
+name: RediSkript
 version: ${project.version}
 authors: [Govindas, ham1255, DaemonicKing]
 api-version: 1.13

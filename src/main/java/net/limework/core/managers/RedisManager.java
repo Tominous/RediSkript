@@ -90,7 +90,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
                     try {
                         /* Data Initialization for channelsInByte array from List<String> channels */
                         for (int x = 0; x < channels.size(); x++) {
-                            channelsInByte[x] = channels.get(x).getBytes();
+                            channelsInByte[x] = channels.get(x).getBytes(StandardCharsets.UTF_8);
                         }
                     } catch (ArrayIndexOutOfBoundsException ex) {
                         reInitializeByteArray = true;
@@ -137,7 +137,6 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
             } else {
                 //encryption is disabled, so let's just get the string
                 receivedMessage = new String(message, StandardCharsets.UTF_8);
-                System.out.println(receivedMessage);
             }
 
             if (receivedMessage != null) {
