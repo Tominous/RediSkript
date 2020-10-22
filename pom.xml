@@ -6,7 +6,7 @@
 
     <groupId>net.limework.core</groupId>
     <artifactId>RediSkript</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.2</version>
     <packaging>jar</packaging>
 	
     <build>
@@ -63,13 +63,10 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
-		<repository>
-            <id>PaperMC</id>
-            <url>https://repo.destroystokyo.com/repository/maven-public/</url>
-        </repository>
-		<repository>
-            <id>sk89q</id>
-            <url>http://maven.sk89q.com/repo</url>
+        <repository>
+            <id>commons-pool2</id>
+            <url>https://mvnrepository.com/artifact/org.apache.commons/commons-pool2</url>
+
         </repository>
     </repositories>
 
@@ -87,11 +84,6 @@
             <scope>provided</scope>
         </dependency>
     <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>2.8.6</version>
-    </dependency>
-    <dependency>
         <groupId>redis.clients</groupId>
         <artifactId>jedis</artifactId>
         <version>3.3.0</version>
@@ -106,11 +98,11 @@
         <artifactId>siv-mode</artifactId>
         <version>1.4.0</version>
     </dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>19.0.0</version>
-            <scope>compile</scope>
-        </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-pool2 -->
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-pool2</artifactId>
+        <version>2.6.2</version>
+    </dependency>
     </dependencies>
 </project>

@@ -146,7 +146,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRedisk&a] &cI got a message that was empty from channel " + channelString + " please check your code that you used to send the message. ^ ignore the error."));
+            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cI got a message that was empty from channel " + channelString + " please check your code that you used to send the message. ^ ignore the error."));
         }
 
     }
