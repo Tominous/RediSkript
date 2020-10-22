@@ -1,6 +1,6 @@
 package net.limework.core.managers;
 
-import net.limework.Data.Encryption;
+import net.limework.data.Encryption;
 import net.limework.core.LimeworkSpigotCore;
 import net.limework.core.events.RedisMessageEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -12,7 +12,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.cryptomator.siv.UnauthenticCiphertextException;
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 import redis.clients.jedis.BinaryJedis;
 import redis.clients.jedis.BinaryJedisPubSub;
@@ -20,6 +19,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 import javax.crypto.IllegalBlockSizeException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -125,19 +125,28 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
     public void onMessage(byte[] channel, byte[] message) {
         String channelString = new String(channel);
         try {
-            String decrypted = null;
-            try {
-                decrypted = encryption.decrypt(message);
-            } catch (UnauthenticCiphertextException | IllegalBlockSizeException e) {
-                e.printStackTrace();
+            String receivedMessage = null;
+            //if encryption is enabled, decrypt the message, else just convert binary to string
+            if (this.encryption.isEncryptionEnabled()) {
+                try {
+                    receivedMessage = encryption.decrypt(message);
+                } catch (UnauthenticCiphertextException | IllegalBlockSizeException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+                //encryption is disabled, so let's just get the string
+                receivedMessage = new String(message, StandardCharsets.UTF_8);
             }
-            assert decrypted != null;
-            JSONObject j = new JSONObject(decrypted);
-            //System.out.println("Message got from channel: "+channel +" and the Message: " +json.toString());
-            plugin.getServer().getPluginManager().callEvent(new RedisMessageEvent(channelString, j.getString("Message")));
+
+            if (receivedMessage != null) {
+                JSONObject j = new JSONObject(receivedMessage);
+                //System.out.println("Message got from channel: "+channel +" and the Message: " +json.toString());
+                plugin.getServer().getPluginManager().callEvent(new RedisMessageEvent(channelString, j.getString("Message")));
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aGBot&a] &cI Got a Message that Was empty from channel " + channel + " Please check your code that you used to send the message. ^ ignore the error."));
+            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRedisk&a] &cI got a message that was empty from channel " + channel + " please check your code that you used to send the message. ^ ignore the error."));
         }
 
     }
@@ -176,11 +185,12 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
         return encryption;
     }
 
+    // the /reloadredis command
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String lable, String[] args) {
         if (sender instanceof Player) {
             sender.sendMessage(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&'
-                    , "&c&lYou can not execute this command!!!!!!")));
+                    , "&cYou cannot execute this command.")));
             return true;
         }
         isKilled.set(true);

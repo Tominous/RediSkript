@@ -1,17 +1,27 @@
 Redis:
-  Password: "yHy0d2zdBlRmaSPj3CiBwEv5V3XxBTLTrCsGW7ntBnzhfxPxXJS6Q1aTtR6DSfAtCZr2VxWnsungXHTcF94a4bsWEpGAvjL6XMU"
+  #a secure password that cannot be cracked, please change it!
+  #it is also recommended to firewall your redis server with iptables so it can only be accessed by specific IP addresses
+  Password: "yHy0d2zdBlRmaSPj3CiBwEv5V3XxBTLTrCsGW7ntBnzhfxPxXJS6Q1aTtR6DSfAtCZr2VxWnsungXHTcF94a4bsWEpGAvjL9XMU"
   Host: "127.0.0.1"
   MaxConnections: 20
   Threads: 10
+  #the default Redis port
   Port: 6379
+  #time out in milliseconds, how long it should take before it decides that it is unable to connect when sending a message
+  #90000 = 90 seconds
   TimeOut: 90000
+  #also known as TLS, only use this if you're running Redis 6.0.6 or higher, older versions will not work correctly
   useSSL: false
-  #useful if SSL is disabled
+  #may be useful if you cannot use SSL due to use of older version of Redis
+  #however this will not encrypt the initial authentication password, only the messages sent
   #also currently EncryptMessages is broken, meaning it must always be true or else it won't work
   EncryptMessages: true
   EncryptionKey: "16CHARACTERS KEY"
   MacKey: "16CHARACTERS KEY"
 
+#the channels from which this server can receive messages
+#you can always send messages to all channels!
+#you can add as many channels as you wish!
 Channels:
   - "Channel1"
   - "Channel2"

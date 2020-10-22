@@ -1,5 +1,4 @@
 package net.limework.core.skript.elements;
-;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser;
@@ -7,11 +6,8 @@ import org.bukkit.event.Event;
 
 public class EvtRedis extends SkriptEvent {
 
-
-
     @Override
     public boolean init(Literal<?>[] literals, int i, SkriptParser.ParseResult parseResult) {
-
         return true;
     }
 

@@ -1,4 +1,4 @@
-package net.limework.Data;
+package net.limework.data;
 
 import org.bukkit.configuration.Configuration;
 import org.cryptomator.siv.SivMode;
