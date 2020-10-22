@@ -124,8 +124,8 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
     @Override
     public void onMessage(byte[] channel, byte[] message) {
         String channelString = new String(channel, StandardCharsets.UTF_8);
+        String receivedMessage = null;
         try {
-            String receivedMessage = null;
             //if encryption is enabled, decrypt the message, else just convert binary to string
             if (this.encryption.isEncryptionEnabled()) {
                 try {
@@ -146,7 +146,8 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cI got a message that was empty from channel " + channelString + " please check your code that you used to send the message. ^ ignore the error."));
+            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cI got a message that was empty from channel " + channelString + " please check your code that you used to send the message. Message content:"));
+            Bukkit.getLogger().warning(receivedMessage);
         }
 
     }
