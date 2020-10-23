@@ -23,7 +23,7 @@ public class ReloadRedis implements CommandExecutor {
         }
         plugin.getRm().reload();
         //not sending to sender, because this command can only be executed via console
-        Bukkit.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &eReloaded via command! Please note that this command is not guaranteed to work correctly, if you face any problem caused by this command, please report it on github.com/Limework/RediSkript/issues"));
+        Bukkit.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &eReloaded via command! Note this command is not stable, it should only be used in urgent cases where you absolutely need to change config details without restarting the server."));
 
         return false;
     }
