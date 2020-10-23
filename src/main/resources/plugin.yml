@@ -3,7 +3,7 @@ name: RediSkript
 version: ${project.version}
 authors: [Govindas, ham1255, DaemonicKing]
 api-version: 1.13
-softdepend:
+depend:
   - Skript
 commands:
   reloadredis:

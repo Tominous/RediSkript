@@ -6,6 +6,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.limework.core.RediSkript;
+import net.limework.core.managers.RedisManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.Event;
@@ -16,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 public class EffSendMessage extends Effect {
     static {
-        Skript.registerEffect(EffSendMessage.class, "send redis message to channel %string% with message %string%");
+        Skript.registerEffect(EffSendMessage.class, "send redis message to channel %string% with [message] %string%", "send redis message %string% to [channel] %string%");
     }
 
 
@@ -26,23 +27,31 @@ public class EffSendMessage extends Effect {
 
     @Override
     protected void execute(Event event) {
+
         RediSkript plugin = (RediSkript) Bukkit.getPluginManager().getPlugin("RediSkript");
+
         String message = this.message.getSingle(event);
         String channel = this.channel.getSingle(event);
-        if (message == null) {//checks if message equals null if true does not execute.
-            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aGBot&a] &cMessage Was empty Please check your code."));
+
+        if (message == null) {
+            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cRedis message was empty. Please check your code."));
+            return;
+        }
+        if (channel == null) {
+            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cChannel was empty. Please check your code."));
             return;
         }
         assert plugin != null;
-        plugin.getRm().getRedisService().execute(() -> {
-            BinaryJedis j = plugin.getRm().getJedisPool().getResource();
+        RedisManager manager = plugin.getRm();
+        manager.getRedisService().execute(() -> {
+            BinaryJedis j = manager.getJedisPool().getResource();
             JSONObject json = new JSONObject();
             json.put("Message", message);
             json.put("Type", "Skript");
             json.put("Date", System.currentTimeMillis()); //for unique string every time & PING calculations
             byte[] msg;
-            if (plugin.getRm().getEncryption().isEncryptionEnabled()) {
-                msg = plugin.getRm().getEncryption().encrypt(json.toString());
+            if (manager.getEncryption().isEncryptionEnabled()) {
+                msg = manager.getEncryption().encrypt(json.toString());
             } else {
                 msg = json.toString().getBytes(StandardCharsets.UTF_8);
             }
@@ -60,8 +69,13 @@ public class EffSendMessage extends Effect {
     @SuppressWarnings("unchecked")
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parser) {
-        this.channel = (Expression<String>) expressions[0];
-        this.message = (Expression<String>) expressions[1];
+        if (matchedPattern == 0) {
+            this.channel = (Expression<String>) expressions[0];
+            this.message = (Expression<String>) expressions[1];
+        } else {
+            this.channel = (Expression<String>) expressions[1];
+            this.message = (Expression<String>) expressions[0];
+        }
         return true;
     }
 

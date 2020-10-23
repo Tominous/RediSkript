@@ -1,16 +1,11 @@
 package net.limework.core.managers;
 
 import net.limework.core.RediSkript;
-import net.limework.data.Encryption;
 import net.limework.core.events.RedisMessageEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.limework.data.Encryption;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.entity.Player;
 import org.cryptomator.siv.UnauthenticCiphertextException;
 import org.json.JSONObject;
 import redis.clients.jedis.BinaryJedis;
@@ -25,7 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class RedisManager extends BinaryJedisPubSub implements Runnable, CommandExecutor {
+public class RedisManager extends BinaryJedisPubSub implements Runnable {
 
     private RediSkript plugin;
 
@@ -39,7 +34,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
     private BinaryJedis subscribeJedis;
     private List<String> channels;
     private AtomicBoolean isShuttingDown = new AtomicBoolean(false);
-    private AtomicBoolean isRedisOnline = new AtomicBoolean();
+    private AtomicBoolean isOnline = new AtomicBoolean();
     private Encryption encryption;
 
 
@@ -76,10 +71,9 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
         while (!isShuttingDown.get()) {
             isKilled.set(false);
             try {
-                message("&e[Jedis] &cConnecting to redis...........");
+                message("&2[&aRediSkript&a] &cConnecting to redis...");
                 if (!this.subscribeJedis.isConnected()) this.subscribeJedis = this.jedisPool.getResource();
-                isRedisOnline.set(true);
-                message("&e[Jedis] &aRedis Connected");
+                message("&2[&aRediSkript&a] &aRedis connected!");
                 int byteArr2dSize = 1;
                 byte[][] channelsInByte = new byte[channels.size()][byteArr2dSize];
                 boolean reInitializeByteArray;
@@ -102,11 +96,10 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
                 this.subscribeJedis.subscribe(this, channelsInByte);
 
             } catch (Exception e) {
-                message("&e[Jedis] &cConnection to redis has failed! &ereconnecting...");
+                message("&2[&aRediSkript&a] &cConnection to redis has failed! &ereconnecting...");
                 if (this.subscribeJedis != null) {
                     this.subscribeJedis.close();
                 }
-                isRedisOnline.set(false);
             }
             try {
                 Thread.sleep(1000);
@@ -162,10 +155,6 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
 
     }
 
-    public boolean IsRedisOnline() {
-        return isRedisOnline.get();
-    }
-
     public JedisPool getJedisPool() {
         return jedisPool;
     }
@@ -174,27 +163,12 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
         return RedisService;
     }
 
-    public AtomicBoolean getIsShuttingDown() {
+    public AtomicBoolean isShuttingDown() {
         return isShuttingDown;
     }
 
-    public AtomicBoolean getIsRedisOnline() {
-        return isRedisOnline;
-    }
-
-    public Encryption getEncryption() {
-        return encryption;
-    }
-
-    // the /reloadredis command
-    @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String lable, String[] args) {
-        if (sender instanceof Player) {
-            sender.sendMessage(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&'
-                    , "&cYou cannot execute this command.")));
-            return true;
-        }
-        isKilled.set(true);
+    public void reloadRedis() {
+        this.isKilled.set(true);
         try {
             if (this.subscribeJedis != null) {
                 this.unsubscribe();
@@ -203,7 +177,13 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable, Command
         } catch (Exception e) {
             e.printStackTrace();
         }
-        start();
-        return false;
+        this.shutdown();
+        plugin.startRedis(true);
+    }
+
+
+
+    public Encryption getEncryption() {
+        return encryption;
     }
 }
