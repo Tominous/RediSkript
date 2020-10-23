@@ -143,7 +143,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
         if (this.subscribeJedis != null) {
             this.unsubscribe();
             this.subscribeJedis.close();
-            this.subscribeJedis.shutdown();
+            this.jedisPool.getResource().close();
         }
         this.RedisService.shutdown();
 
