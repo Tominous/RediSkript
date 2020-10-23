@@ -60,6 +60,9 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
     }
 
     public void start() {
+        if (isShuttingDown.get()) {
+            isShuttingDown.set(false);
+        }
         this.RedisService.execute(this);
     }
 
@@ -148,9 +151,10 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
         this.RedisService.shutdown();
 
     }
+
     public void reload() {
+        shutdown();
         plugin.reloadConfig();
-        subscribeJedis.close();
         Configuration config = this.plugin.getConfig();
         JedisPoolConfig JConfig = new JedisPoolConfig();
         JConfig.setMaxTotal(config.getInt("Redis.MaxConnections"));
@@ -163,7 +167,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                 config.getInt("Redis.TimeOut"),
                 config.getString("Redis.Password"),
                 config.getBoolean("Redis.useSSL"));
-        RedisService.shutdownNow();
+        RedisService.shutdown();
         RedisService = Executors.newFixedThreadPool(config.getInt("Redis.Threads"));
         try {
             this.subscribeJedis = this.jedisPool.getResource();
@@ -171,6 +175,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
         }
         this.channels = config.getStringList("Channels");
         encryption = new Encryption(config);
+        start();
     }
 
     public JedisPool getJedisPool() {
