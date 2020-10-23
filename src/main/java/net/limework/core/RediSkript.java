@@ -10,16 +10,12 @@ public class RediSkript extends JavaPlugin {
     //Redis manager
     private RedisManager rm;
 
-    public void startRedis(boolean reload) {
-        if (reload) { reloadConfig(); }
-        rm = new RedisManager(this);
-        rm.start();
-    }
     @Override
     public void onEnable() {
         saveDefaultConfig();
         if (getServer().getPluginManager().getPlugin("Skript") != null) {
-            startRedis(false);
+            rm = new RedisManager(this);
+            rm.start();
 
             PluginCommand command = getServer().getPluginCommand("reloadredis");
             assert command != null;
