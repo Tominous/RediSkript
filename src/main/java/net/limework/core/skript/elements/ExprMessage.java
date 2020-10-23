@@ -1,9 +1,12 @@
 package net.limework.core.skript.elements;
 
 
+import ch.njol.skript.ScriptLoader;
+import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.log.ErrorQuality;
 import ch.njol.util.Kleenean;
 import net.limework.core.events.RedisMessageEvent;
 import org.bukkit.event.Event;
@@ -22,12 +25,16 @@ public class ExprMessage extends SimpleExpression<String> {
     }
 
     @Override
-    public String toString(Event event, boolean b) {
+    public String toString(Event event, boolean debug) {
         return "redis message";
     }
 
     @Override
-    public boolean init(Expression<?>[] expressions, int i, Kleenean kleenean, SkriptParser.ParseResult parseResult) {
+    public boolean init(final Expression<?>[] expressions, final int matchedPattern, final Kleenean isDelayed, final SkriptParser.ParseResult parseResult) {
+        if (!ScriptLoader.isCurrentEvent(RedisMessageEvent.class)) {
+            Skript.error("Cannot use 'redis message' outside of a redis message event", ErrorQuality.SEMANTIC_ERROR);
+            return false;
+        }
         return true;
     }
 

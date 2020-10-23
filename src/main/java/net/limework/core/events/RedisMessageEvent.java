@@ -9,11 +9,13 @@ public class RedisMessageEvent extends Event {
 
     private String channelName;
     private String message;
+    private long date;
 
-    public RedisMessageEvent(String channelName , String message) {
+    public RedisMessageEvent(String channelName , String message, long date) {
         super(true);
         this.channelName = channelName;
         this.message = message;
+        this.date = date;
     }
 
 
@@ -33,6 +35,8 @@ public class RedisMessageEvent extends Event {
     public String getChannelName() {
         return channelName;
     }
+
+    public long getDate() { return date;}
 
     public String getMessage() {
         return message;

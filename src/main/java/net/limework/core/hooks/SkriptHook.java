@@ -4,12 +4,14 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.registrations.EventValues;
+import ch.njol.skript.util.Date;
 import ch.njol.skript.util.Getter;
 import net.limework.core.RediSkript;
 import net.limework.core.events.RedisMessageEvent;
 import net.limework.core.skript.elements.EvtRedis;
 import net.limework.core.skript.elements.ExprChannel;
 import net.limework.core.skript.elements.ExprMessage;
+import net.limework.core.skript.elements.ExprMessageDate;
 
 import java.io.IOException;
 
@@ -35,12 +37,15 @@ public class SkriptHook {
                     return e.getMessage();
                 }
             }, 0);
+            Skript.registerExpression(ExprMessageDate.class, Date.class, ExpressionType.SIMPLE, "redis message date");
+            EventValues.registerEventValue(RedisMessageEvent.class, Date.class, new Getter<Date, RedisMessageEvent>() {
+                @Override
+                public Date get(RedisMessageEvent e) {
+                    return new Date(e.getDate());
+                }
+            }, 0);
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public SkriptAddon getAddon() {
-        return addon;
     }
 }

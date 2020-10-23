@@ -17,12 +17,12 @@ public class ReloadRedis implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (sender instanceof Player) {
             sender.sendMessage(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&'
-                    , "&cYou cannot execute this command.")));
+                    , "&2[&aRediSkript&a] &cThis command can only be executed in console.")));
             return true;
         }
-        plugin.getRm().reloadRedis();
+        plugin.getRm().reload();
         sender.sendMessage(TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&'
-                , "&eRediSkript has been reloaded!")));
+                , "&2[&aRediSkript&a] &eReloaded! Please note that this command is not guaranteed to work correctly, if you face any problem caused by this command, please report it on github.com/Limework/RediSkript/issues")));
         return false;
     }
 }

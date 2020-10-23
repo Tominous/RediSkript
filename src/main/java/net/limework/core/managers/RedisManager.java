@@ -69,11 +69,10 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
     @Override
     public void run() {
         while (!isShuttingDown.get()) {
-            isKilled.set(false);
             try {
-                message("&2[&aRediSkript&a] &cConnecting to redis...");
+                plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cConnecting to redis..."));
                 if (!this.subscribeJedis.isConnected()) this.subscribeJedis = this.jedisPool.getResource();
-                message("&2[&aRediSkript&a] &aRedis connected!");
+                plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &aRedis connected!"));
                 int byteArr2dSize = 1;
                 byte[][] channelsInByte = new byte[channels.size()][byteArr2dSize];
                 boolean reInitializeByteArray;
@@ -96,7 +95,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                 this.subscribeJedis.subscribe(this, channelsInByte);
 
             } catch (Exception e) {
-                message("&2[&aRediSkript&a] &cConnection to redis has failed! &ereconnecting...");
+                plugin.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cConnection to redis has failed! &ereconnecting..."));
                 if (this.subscribeJedis != null) {
                     this.subscribeJedis.close();
                 }
@@ -106,12 +105,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if (isKilled.get()) break;
         }
-    }
-
-    private void message(String message) {
-        plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', message));
     }
 
     @Override
@@ -135,7 +129,9 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
             if (receivedMessage != null) {
                 JSONObject j = new JSONObject(receivedMessage);
                 //System.out.println("Message got from channel: "+channel +" and the Message: " +json.toString());
-                plugin.getServer().getPluginManager().callEvent(new RedisMessageEvent(channelString, j.getString("Message")));
+                RedisMessageEvent event = new RedisMessageEvent(channelString, j.getString("Message"), j.getLong("Date"));
+                //Running it synchronously to ensure that the event is always synchronous
+                Bukkit.getScheduler().runTask(plugin, () -> plugin.getServer().getPluginManager().callEvent(event));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -154,6 +150,10 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
         this.RedisService.shutdown();
 
     }
+    public void reload() {
+        this.shutdown();
+        plugin.startRedis(true);
+    }
 
     public JedisPool getJedisPool() {
         return jedisPool;
@@ -162,26 +162,6 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
     public ExecutorService getRedisService() {
         return RedisService;
     }
-
-    public AtomicBoolean isShuttingDown() {
-        return isShuttingDown;
-    }
-
-    public void reloadRedis() {
-        this.isKilled.set(true);
-        try {
-            if (this.subscribeJedis != null) {
-                this.unsubscribe();
-                this.subscribeJedis.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        this.shutdown();
-        plugin.startRedis(true);
-    }
-
-
 
     public Encryption getEncryption() {
         return encryption;

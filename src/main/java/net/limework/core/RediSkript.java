@@ -9,10 +9,8 @@ public class RediSkript extends JavaPlugin {
     //Redis manager
     private RedisManager rm;
 
-    public void startRedis(boolean reloadConfig) {
-        if (reloadConfig) {
-            reloadConfig();
-        }
+    public void startRedis(boolean reload) {
+        if (reload) { reloadConfig(); }
         rm = new RedisManager(this);
         rm.start();
     }
