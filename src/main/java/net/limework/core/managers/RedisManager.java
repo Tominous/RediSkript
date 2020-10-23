@@ -130,8 +130,8 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                 JSONObject j = new JSONObject(receivedMessage);
                 //System.out.println("Message got from channel: "+channel +" and the Message: " +json.toString());
                 RedisMessageEvent event = new RedisMessageEvent(channelString, j.getString("Message"), j.getLong("Date"));
-                //Running it synchronously to ensure that the event is always synchronous
-                Bukkit.getScheduler().runTask(plugin, () -> plugin.getServer().getPluginManager().callEvent(event));
+
+                plugin.getServer().getPluginManager().callEvent(event);
             }
         } catch (Exception e) {
             e.printStackTrace();

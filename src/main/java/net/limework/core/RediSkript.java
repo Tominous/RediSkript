@@ -2,6 +2,7 @@ package net.limework.core;
 import net.limework.core.commands.ReloadRedis;
 import net.limework.core.hooks.SkriptHook;
 import net.limework.core.managers.RedisManager;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class RediSkript extends JavaPlugin {
@@ -19,7 +20,11 @@ public class RediSkript extends JavaPlugin {
         saveDefaultConfig();
         if (getServer().getPluginManager().getPlugin("Skript") != null) {
             startRedis(false);
-            getServer().getPluginCommand("reloadredis").setExecutor(new ReloadRedis(this));
+
+            PluginCommand command = getServer().getPluginCommand("reloadredis");
+            assert command != null;
+            command.setExecutor(new ReloadRedis(this));
+
             new SkriptHook(this);
         } else {
             getLogger().info("Skript wasn't found.");
