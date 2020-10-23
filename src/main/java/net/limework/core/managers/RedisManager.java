@@ -27,14 +27,11 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
     private JedisPool jedisPool;
     private ExecutorService RedisService;
 
-    private AtomicBoolean isKilled = new AtomicBoolean();
-
 
     //sub
     private BinaryJedis subscribeJedis;
     private List<String> channels;
     private AtomicBoolean isShuttingDown = new AtomicBoolean(false);
-    private AtomicBoolean isOnline = new AtomicBoolean();
     private Encryption encryption;
 
 
@@ -146,6 +143,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
         if (this.subscribeJedis != null) {
             this.unsubscribe();
             this.subscribeJedis.close();
+            this.subscribeJedis.shutdown();
         }
         this.RedisService.shutdown();
 
