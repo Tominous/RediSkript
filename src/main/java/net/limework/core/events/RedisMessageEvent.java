@@ -12,7 +12,7 @@ public class RedisMessageEvent extends Event {
     private long date;
 
     public RedisMessageEvent(String channelName , String message, long date) {
-        super(true);
+        super(false);
         this.channelName = channelName;
         this.message = message;
         this.date = date;
