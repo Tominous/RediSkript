@@ -39,8 +39,11 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
         this.plugin = plugin;
         Configuration config = this.plugin.getConfig();
         JedisPoolConfig JConfig = new JedisPoolConfig();
-        JConfig.setMaxTotal(config.getInt("Redis.MaxConnections"));
-        JConfig.setMaxIdle(config.getInt("Redis.MaxConnections"));
+        int maxConnections = config.getInt("Redis.MaxConnections");
+        if (maxConnections < 2) { maxConnections = 2; }
+
+        JConfig.setMaxTotal(maxConnections);
+        JConfig.setMaxIdle(maxConnections);
         JConfig.setMinIdle(1);
         JConfig.setBlockWhenExhausted(true);
         this.jedisPool = new JedisPool(JConfig,
@@ -49,7 +52,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                 config.getInt("Redis.TimeOut"),
                 config.getString("Redis.Password"),
                 config.getBoolean("Redis.useTLS"));
-        RedisService = Executors.newFixedThreadPool(config.getInt("Redis.Threads"));
+        RedisService = Executors.newSingleThreadExecutor();
         try {
             this.subscribeJedis = this.jedisPool.getResource();
         } catch (Exception ignored) {
@@ -73,7 +76,6 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                 int byteArr2dSize = 1;
                 byte[][] channelsInByte = new byte[channels.size()][byteArr2dSize];
                 boolean reInitializeByteArray;
-
                 // Loop that reInitialize array IF array size is not enough
                 do {
                     reInitializeByteArray = false;
@@ -90,6 +92,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                     }
                 } while (reInitializeByteArray);
                 this.subscribeJedis.subscribe(this, channelsInByte);
+
 
             } catch (Exception e) {
                 plugin.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cConnection to redis has failed! &ereconnecting..."));
@@ -155,10 +158,6 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
 
     public JedisPool getJedisPool() {
         return jedisPool;
-    }
-
-    public ExecutorService getRedisService() {
-        return RedisService;
     }
 
     public Encryption getEncryption() {

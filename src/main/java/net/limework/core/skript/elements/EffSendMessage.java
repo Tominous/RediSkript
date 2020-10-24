@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 public class EffSendMessage extends Effect {
     static {
-        Skript.registerEffect(EffSendMessage.class, "send redis message to channel %string% with [message] %string%", "send redis message %string% to [channel] %string%");
+        Skript.registerEffect(EffSendMessage.class, "send redis message %string% to [channel] %string%");
     }
 
 
@@ -43,7 +43,7 @@ public class EffSendMessage extends Effect {
         }
         assert plugin != null;
         RedisManager manager = plugin.getRm();
-        manager.getRedisService().execute(() -> {
+        //manager.getRedisService().execute(() -> {
             BinaryJedis j = manager.getJedisPool().getResource();
             JSONObject json = new JSONObject();
             json.put("Message", message);
@@ -57,7 +57,7 @@ public class EffSendMessage extends Effect {
             }
             j.publish(channel.getBytes(StandardCharsets.UTF_8), msg);
             j.close();
-        });
+        //});
 
     }
 
@@ -69,13 +69,8 @@ public class EffSendMessage extends Effect {
     @SuppressWarnings("unchecked")
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parser) {
-        if (matchedPattern == 0) {
-            this.channel = (Expression<String>) expressions[0];
-            this.message = (Expression<String>) expressions[1];
-        } else {
-            this.channel = (Expression<String>) expressions[1];
-            this.message = (Expression<String>) expressions[0];
-        }
+        this.message = (Expression<String>) expressions[0];
+        this.channel = (Expression<String>) expressions[1];
         return true;
     }
 
