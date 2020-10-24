@@ -48,7 +48,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                 config.getInt("Redis.Port"),
                 config.getInt("Redis.TimeOut"),
                 config.getString("Redis.Password"),
-                config.getBoolean("Redis.useSSL"));
+                config.getBoolean("Redis.useTLS"));
         RedisService = Executors.newFixedThreadPool(config.getInt("Redis.Threads"));
         try {
             this.subscribeJedis = this.jedisPool.getResource();

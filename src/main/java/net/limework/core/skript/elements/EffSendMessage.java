@@ -63,7 +63,7 @@ public class EffSendMessage extends Effect {
 
     @Override
     public String toString(Event event, boolean b) {
-        return "send redis message to channel " + channel.getSingle(event) + " with message " + message.getSingle(event);
+        return "send redis message " + message.getSingle(event) + " to channel " + channel.getSingle(event);
     }
 
     @SuppressWarnings("unchecked")

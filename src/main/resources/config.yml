@@ -10,10 +10,12 @@ Redis:
   #time out in milliseconds, how long it should take before it decides that it is unable to connect when sending a message
   #90000 = 90 seconds
   TimeOut: 90000
-  #also known as TLS, only use this if you're running Redis 6.0.6 or higher, older versions will not work correctly
-  useSSL: false
-  #may be useful if you cannot use SSL due to use of older version of Redis
+  #also known as SSL, only use this if you're running Redis 6.0.6 or higher, older versions will not work correctly
+  #it encrypts your traffic and makes data exchange between distant servers completely secure
+  useTLS: false
+  #may be useful if you cannot use TLS due to use of older version of Redis
   #however this will not encrypt the initial authentication password, only the messages sent
+  #it uses AES-128 SIV encryption which is secure enough for this
   EncryptMessages: true
   EncryptionKey: "16CHARACTERS KEY"
   MacKey: "16CHARACTERS KEY"
