@@ -149,28 +149,8 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
 
     }
     public void reload() {
-        plugin.reloadConfig();
-        subscribeJedis.close();
-        Configuration config = this.plugin.getConfig();
-        JedisPoolConfig JConfig = new JedisPoolConfig();
-        JConfig.setMaxTotal(config.getInt("Redis.MaxConnections"));
-        JConfig.setMaxIdle(config.getInt("Redis.MaxConnections"));
-        JConfig.setMinIdle(1);
-        JConfig.setBlockWhenExhausted(true);
-        this.jedisPool = new JedisPool(JConfig,
-                config.getString("Redis.Host"),
-                config.getInt("Redis.Port"),
-                config.getInt("Redis.TimeOut"),
-                config.getString("Redis.Password"),
-                config.getBoolean("Redis.useSSL"));
-        RedisService.shutdownNow();
-        RedisService = Executors.newFixedThreadPool(config.getInt("Redis.Threads"));
-        try {
-            this.subscribeJedis = this.jedisPool.getResource();
-        } catch (Exception ignored) {
-        }
-        this.channels = config.getStringList("Channels");
-        encryption = new Encryption(config);
+        this.shutdown();
+        plugin.startRedis(true);
     }
 
     public JedisPool getJedisPool() {
