@@ -12,6 +12,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.event.Event;
 import org.json.JSONObject;
 import redis.clients.jedis.BinaryJedis;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.nio.charset.StandardCharsets;
 
@@ -42,33 +43,37 @@ public class EffSendMessage extends Effect {
             return;
         }
         assert plugin != null;
+        JSONObject json = new JSONObject();
+        json.put("Message", message);
+        json.put("Type", "Skript");
+        json.put("Date", System.currentTimeMillis()); //for unique string every time & PING calculations
+        byte[] msg;
         RedisManager manager = plugin.getRm();
-        //manager.getRedisService().execute(() -> {
+
+        if (manager.getEncryption().isEncryptionEnabled()) {
+            msg = manager.getEncryption().encrypt(json.toString());
+        } else {
+            msg = json.toString().getBytes(StandardCharsets.UTF_8);
+        }
+        try {
             BinaryJedis j = manager.getJedisPool().getResource();
-            JSONObject json = new JSONObject();
-            json.put("Message", message);
-            json.put("Type", "Skript");
-            json.put("Date", System.currentTimeMillis()); //for unique string every time & PING calculations
-            byte[] msg;
-            if (manager.getEncryption().isEncryptionEnabled()) {
-                msg = manager.getEncryption().encrypt(json.toString());
-            } else {
-                msg = json.toString().getBytes(StandardCharsets.UTF_8);
-            }
+
             j.publish(channel.getBytes(StandardCharsets.UTF_8), msg);
             j.close();
-        //});
+        } catch (JedisConnectionException exception) {
+            exception.printStackTrace();
+        }
 
     }
 
     @Override
-    public String toString(Event event, boolean b) {
+    public String toString(Event event, boolean debug) {
         return "send redis message " + message.getSingle(event) + " to channel " + channel.getSingle(event);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parser) {
+    public boolean init(final Expression<?>[] expressions, final int matchedPattern, final Kleenean isDelayed, final SkriptParser.ParseResult parser) {
         this.message = (Expression<String>) expressions[0];
         this.channel = (Expression<String>) expressions[1];
         return true;
