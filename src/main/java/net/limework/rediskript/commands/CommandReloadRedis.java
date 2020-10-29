@@ -1,6 +1,6 @@
-package net.limework.core.commands;
+package net.limework.rediskript.commands;
 
-import net.limework.core.RediSkript;
+import net.limework.rediskript.RediSkript;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -8,9 +8,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ReloadRedis implements CommandExecutor {
+public class CommandReloadRedis implements CommandExecutor {
     private RediSkript plugin;
-    public ReloadRedis(RediSkript plugin) {
+    public CommandReloadRedis(RediSkript plugin) {
         this.plugin = plugin;
     }
     @Override

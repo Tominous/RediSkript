@@ -1,4 +1,4 @@
-package net.limework.core.hooks;
+package net.limework.rediskript.skript;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
@@ -6,12 +6,12 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.Getter;
-import net.limework.core.RediSkript;
-import net.limework.core.events.RedisMessageEvent;
-import net.limework.core.skript.elements.EvtRedis;
-import net.limework.core.skript.elements.ExprChannel;
-import net.limework.core.skript.elements.ExprMessage;
-import net.limework.core.skript.elements.ExprMessageDate;
+import net.limework.rediskript.RediSkript;
+import net.limework.rediskript.events.RedisMessageEvent;
+import net.limework.rediskript.skript.elements.EvtRedis;
+import net.limework.rediskript.skript.elements.ExprChannel;
+import net.limework.rediskript.skript.elements.ExprMessage;
+import net.limework.rediskript.skript.elements.ExprMessageDate;
 
 import java.io.IOException;
 

@@ -1,4 +1,4 @@
-package net.limework.core.events;
+package net.limework.rediskript.events;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

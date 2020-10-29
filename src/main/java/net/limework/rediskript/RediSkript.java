@@ -1,7 +1,7 @@
-package net.limework.core;
-import net.limework.core.commands.ReloadRedis;
-import net.limework.core.hooks.SkriptHook;
-import net.limework.core.managers.RedisManager;
+package net.limework.rediskript;
+import net.limework.rediskript.commands.CommandReloadRedis;
+import net.limework.rediskript.skript.SkriptHook;
+import net.limework.rediskript.managers.RedisManager;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -25,7 +25,7 @@ public class RediSkript extends JavaPlugin {
 
             PluginCommand command = getServer().getPluginCommand("reloadredis");
             assert command != null;
-            command.setExecutor(new ReloadRedis(this));
+            command.setExecutor(new CommandReloadRedis(this));
 
             new SkriptHook(this);
         } else {

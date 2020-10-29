@@ -1,4 +1,4 @@
-package net.limework.core.skript.elements;
+package net.limework.rediskript.skript.elements;
 
 
 import ch.njol.skript.ScriptLoader;
@@ -9,7 +9,7 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.util.Date;
 import ch.njol.util.Kleenean;
-import net.limework.core.events.RedisMessageEvent;
+import net.limework.rediskript.events.RedisMessageEvent;
 import org.bukkit.event.Event;
 
 public class ExprMessageDate extends SimpleExpression<Date> {

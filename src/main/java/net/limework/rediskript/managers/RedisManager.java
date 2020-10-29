@@ -1,8 +1,8 @@
-package net.limework.core.managers;
+package net.limework.rediskript.managers;
 
-import net.limework.core.RediSkript;
-import net.limework.core.events.RedisMessageEvent;
-import net.limework.data.Encryption;
+import net.limework.rediskript.RediSkript;
+import net.limework.rediskript.events.RedisMessageEvent;
+import net.limework.rediskript.data.Encryption;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.Configuration;

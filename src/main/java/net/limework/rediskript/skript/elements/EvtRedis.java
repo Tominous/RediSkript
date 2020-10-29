@@ -1,14 +1,14 @@
-package net.limework.core.skript.elements;
+package net.limework.rediskript.skript.elements;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser;
-import net.limework.core.events.RedisMessageEvent;
+import net.limework.rediskript.events.RedisMessageEvent;
 import org.bukkit.event.Event;
 
 public class EvtRedis extends SkriptEvent {
 
     @Override
-    public boolean init(Literal<?>[] literals, int i, SkriptParser.ParseResult parseResult) {
+    public boolean init(final Literal<?>[] literals, final int i, final SkriptParser.ParseResult parseResult) {
         return true;
     }
 

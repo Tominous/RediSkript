@@ -1,12 +1,12 @@
-package net.limework.core.skript.elements;
+package net.limework.rediskript.skript.elements;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
-import net.limework.core.RediSkript;
-import net.limework.core.managers.RedisManager;
+import net.limework.rediskript.RediSkript;
+import net.limework.rediskript.managers.RedisManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.Event;
