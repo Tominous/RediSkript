@@ -70,9 +70,9 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
     public void run() {
         while (!isShuttingDown.get()) {
             try {
-                plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cConnecting to redis..."));
+                plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&cConnecting to redis..."));
                 if (!this.subscribeJedis.isConnected()) this.subscribeJedis = this.jedisPool.getResource();
-                plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &aRedis connected!"));
+                plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&aRedis connected!"));
                 int byteArr2dSize = 1;
                 byte[][] channelsInByte = new byte[channels.size()][byteArr2dSize];
                 boolean reInitializeByteArray;
@@ -95,7 +95,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
 
 
             } catch (Exception e) {
-                plugin.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cConnection to redis has failed! &ereconnecting..."));
+                plugin.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&cConnection to redis has failed! &cReconnecting..."));
                 if (this.subscribeJedis != null) {
                     this.subscribeJedis.close();
                 }
@@ -134,7 +134,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cI got a message that was empty from channel " + channelString + " please check your code that you used to send the message. Message content:"));
+            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&cI got a message that was empty from channel " + channelString + " please check your code that you used to send the message. Message content:"));
             Bukkit.getLogger().warning(receivedMessage);
         }
 
