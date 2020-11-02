@@ -3,8 +3,7 @@ name: RediSkript
 version: ${project.version}
 authors: [Govindas, ham1255, DaemonicKing]
 api-version: 1.13
-depend:
-  - Skript
+depend: [Skript]
 commands:
   reloadredis:
     description: "Reload redis configuration & restart the connection."

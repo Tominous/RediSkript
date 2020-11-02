@@ -20,17 +20,13 @@ public class RediSkript extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        if (getServer().getPluginManager().getPlugin("Skript") != null) {
-            startRedis(false);
+        startRedis(false);
 
-            PluginCommand command = getServer().getPluginCommand("reloadredis");
-            assert command != null;
-            command.setExecutor(new CommandReloadRedis(this));
+        PluginCommand command = getServer().getPluginCommand("reloadredis");
+        assert command != null;
+        command.setExecutor(new CommandReloadRedis(this));
 
-            new SkriptHook(this);
-        } else {
-            getLogger().info("Skript wasn't found.");
-        }
+        new SkriptHook(this);
     }
 
     @Override
