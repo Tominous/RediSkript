@@ -49,17 +49,17 @@ public class EffSendMessage extends Effect {
         json.put("Date", System.currentTimeMillis()); //for unique string every time & PING calculations
         byte[] msg;
         RedisManager manager = plugin.getRm();
-
         if (manager.getEncryption().isEncryptionEnabled()) {
             msg = manager.getEncryption().encrypt(json.toString());
         } else {
             msg = json.toString().getBytes(StandardCharsets.UTF_8);
         }
         try {
-            BinaryJedis j = manager.getJedisPool().getResource();
-
-            j.publish(channel.getBytes(StandardCharsets.UTF_8), msg);
-            j.close();
+            manager.getRedisService().execute(() -> {
+                BinaryJedis j = manager.getJedisPool().getResource();
+                j.publish(channel.getBytes(StandardCharsets.UTF_8), msg);
+                j.close();
+            });
         } catch (JedisConnectionException exception) {
             exception.printStackTrace();
         }

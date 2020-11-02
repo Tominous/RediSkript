@@ -1,4 +1,4 @@
-main: net.limework.core.RediSkript
+main: net.limework.rediskript.RediSkript
 name: RediSkript
 version: ${project.version}
 authors: [Govindas, ham1255, DaemonicKing]

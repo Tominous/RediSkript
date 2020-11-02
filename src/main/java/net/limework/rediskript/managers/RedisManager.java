@@ -52,7 +52,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                 config.getInt("Redis.TimeOut"),
                 config.getString("Redis.Password"),
                 config.getBoolean("Redis.useTLS"));
-        RedisService = Executors.newSingleThreadExecutor();
+        RedisService = Executors.newFixedThreadPool(3);
         try {
             this.subscribeJedis = this.jedisPool.getResource();
         } catch (Exception ignored) {
@@ -163,4 +163,6 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
     public Encryption getEncryption() {
         return encryption;
     }
+
+    public ExecutorService getRedisService() { return RedisService; }
 }
