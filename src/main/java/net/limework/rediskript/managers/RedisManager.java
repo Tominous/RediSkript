@@ -18,10 +18,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RedisManager extends BinaryJedisPubSub implements Runnable {
 
+    private final ExecutorService RedisReconnector;
     private RediSkript plugin;
 
     private JedisPool jedisPool;
@@ -52,7 +54,8 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                 config.getInt("Redis.TimeOut"),
                 config.getString("Redis.Password"),
                 config.getBoolean("Redis.useTLS"));
-        RedisService = Executors.newFixedThreadPool(3);
+        RedisReconnector = Executors.newSingleThreadExecutor();
+        RedisService = Executors.newSingleThreadExecutor();
         try {
             this.subscribeJedis = this.jedisPool.getResource();
         } catch (Exception ignored) {
@@ -63,7 +66,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
     }
 
     public void start() {
-        this.RedisService.execute(this);
+        this.RedisReconnector.execute(this);
     }
 
     @Override
@@ -130,7 +133,12 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                 JSONObject j = new JSONObject(receivedMessage);
                 //System.out.println("Message got from channel: "+channel +" and the Message: " +json.toString());
                 RedisMessageEvent event = new RedisMessageEvent(channelString, j.getString("Message"), j.getLong("Date"));
-                Bukkit.getScheduler().runTask(plugin, () -> plugin.getServer().getPluginManager().callEvent(event));
+
+                //if plugin is disabling, don't call events anymore
+
+                if (plugin.isEnabled()) {
+                    Bukkit.getScheduler().runTask(plugin, () -> plugin.getServer().getPluginManager().callEvent(event));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -141,6 +149,11 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
     }
 
     public void shutdown() {
+        try {
+            this.RedisService.awaitTermination(1, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         this.isShuttingDown.set(true);
         if (this.subscribeJedis != null) {
             this.unsubscribe();
@@ -148,6 +161,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
             this.subscribeJedis.getClient().close();
             this.jedisPool.getResource().close();
         }
+        this.RedisReconnector.shutdown();
         this.RedisService.shutdown();
 
     }

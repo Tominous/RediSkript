@@ -16,12 +16,10 @@ import net.limework.rediskript.skript.elements.ExprMessageDate;
 import java.io.IOException;
 
 public class SkriptHook {
-
-    private SkriptAddon addon;
     public SkriptHook(RediSkript plugin) {
-        addon = Skript.registerAddon(plugin);
+        SkriptAddon addon = Skript.registerAddon(plugin);
         try {
-            addon.loadClasses("net.limework.core.skript", "elements");
+            addon.loadClasses("net.limework.rediskript.skript", "elements");
             Skript.registerEvent("redis message", EvtRedis.class, RedisMessageEvent.class, "redis message");
             Skript.registerExpression(ExprChannel.class, String.class, ExpressionType.SIMPLE, "redis channel");
             EventValues.registerEventValue(RedisMessageEvent.class, String.class, new Getter<String, RedisMessageEvent>() {

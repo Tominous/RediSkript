@@ -6,7 +6,7 @@
 
     <groupId>net.limework.rediskript</groupId>
     <artifactId>RediSkript</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.5</version>
     <packaging>jar</packaging>
 	
     <build>

@@ -55,11 +55,23 @@ public class EffSendMessage extends Effect {
             msg = json.toString().getBytes(StandardCharsets.UTF_8);
         }
         try {
-            manager.getRedisService().execute(() -> {
+
+            //execute sending of redis message on the main thread if plugin is disabling
+            //so it can still process the sending
+
+            //sending a redis message blocks main thread if there's no more connections available
+            //so to avoid issues, it's best to do it always on separate thread
+            if (plugin.isEnabled()) {
+                manager.getRedisService().execute(() -> {
+                    BinaryJedis j = manager.getJedisPool().getResource();
+                    j.publish(channel.getBytes(StandardCharsets.UTF_8), msg);
+                    j.close();
+                });
+            } else {
                 BinaryJedis j = manager.getJedisPool().getResource();
                 j.publish(channel.getBytes(StandardCharsets.UTF_8), msg);
                 j.close();
-            });
+            }
         } catch (JedisConnectionException exception) {
             exception.printStackTrace();
         }
