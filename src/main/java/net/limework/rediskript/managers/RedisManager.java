@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RedisManager extends BinaryJedisPubSub implements Runnable {
 
-    private final ExecutorService RedisReconnector;
+    private ExecutorService RedisReconnector;
     private RediSkript plugin;
 
     private JedisPool jedisPool;
@@ -149,11 +149,6 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
     }
 
     public void shutdown() {
-        try {
-            this.RedisService.awaitTermination(1, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         this.isShuttingDown.set(true);
         if (this.subscribeJedis != null) {
             this.unsubscribe();
@@ -163,6 +158,8 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
         }
         this.RedisReconnector.shutdown();
         this.RedisService.shutdown();
+        this.RedisService = null;
+        this.RedisReconnector = null;
 
     }
     public void reload() {
