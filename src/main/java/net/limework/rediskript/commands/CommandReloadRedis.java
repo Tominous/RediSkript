@@ -18,7 +18,7 @@ public class CommandReloadRedis implements CommandExecutor {
         if (sender instanceof Player) {
             //not using bungee TextComponent because it is not present in 1.8.8
             sender.sendMessage((ChatColor.translateAlternateColorCodes('&'
-                    , "&2[&aRediSkript&a] &cThis command can only be executed in console.")));
+                    , "&2[&aRediSkript&2] &cThis command can only be executed in console.")));
             return true;
         }
         plugin.getRm().reload();
