@@ -6,12 +6,10 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Date;
 import ch.njol.skript.util.Getter;
+import ch.njol.skript.util.Timespan;
 import net.limework.rediskript.RediSkript;
 import net.limework.rediskript.events.RedisMessageEvent;
-import net.limework.rediskript.skript.elements.EvtRedis;
-import net.limework.rediskript.skript.elements.ExprChannel;
-import net.limework.rediskript.skript.elements.ExprMessage;
-import net.limework.rediskript.skript.elements.ExprMessageDate;
+import net.limework.rediskript.skript.elements.*;
 
 import java.io.IOException;
 
@@ -21,6 +19,8 @@ public class SkriptHook {
         try {
             addon.loadClasses("net.limework.rediskript.skript", "elements");
             Skript.registerEvent("redis message", EvtRedis.class, RedisMessageEvent.class, "redis message");
+            Skript.registerExpression(ExprVariableInChannel.class, Object.class, ExpressionType.PROPERTY, "variable %strings% in [redis] channel %string%");
+
             Skript.registerExpression(ExprChannel.class, String.class, ExpressionType.SIMPLE, "redis channel");
             EventValues.registerEventValue(RedisMessageEvent.class, String.class, new Getter<String, RedisMessageEvent>() {
                 @Override

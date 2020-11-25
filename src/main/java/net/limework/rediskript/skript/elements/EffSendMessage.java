@@ -34,7 +34,6 @@ public class EffSendMessage extends Effect {
 
         String[] message = this.message.getAll(event);
         String channel = this.channel.getSingle(event);
-
         if (message[0] == null) {
             Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cRedis message was empty. Please check your code."));
             return;
@@ -43,40 +42,7 @@ public class EffSendMessage extends Effect {
             Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cChannel was empty. Please check your code."));
             return;
         }
-        assert plugin != null;
-        JSONObject json = new JSONObject();
-        json.put("Messages", new JSONArray(message));
-        json.put("Type", "Skript");
-        json.put("Date", System.currentTimeMillis()); //for unique string every time & PING calculations
-        byte[] msg;
-        RedisManager manager = plugin.getRm();
-        if (manager.getEncryption().isEncryptionEnabled()) {
-            msg = manager.getEncryption().encrypt(json.toString());
-        } else {
-            msg = json.toString().getBytes(StandardCharsets.UTF_8);
-        }
-        try {
-
-            //execute sending of redis message on the main thread if plugin is disabling
-            //so it can still process the sending
-
-            //sending a redis message blocks main thread if there's no more connections available
-            //so to avoid issues, it's best to do it always on separate thread
-            if (plugin.isEnabled()) {
-                manager.getRedisService().execute(() -> {
-                    BinaryJedis j = manager.getJedisPool().getResource();
-                    j.publish(channel.getBytes(StandardCharsets.UTF_8), msg);
-                    j.close();
-                });
-            } else {
-                BinaryJedis j = manager.getJedisPool().getResource();
-                j.publish(channel.getBytes(StandardCharsets.UTF_8), msg);
-                j.close();
-            }
-        } catch (JedisConnectionException exception) {
-            exception.printStackTrace();
-        }
-
+        plugin.getRm().sendMessage(message, channel);
     }
 
     @Override

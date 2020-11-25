@@ -1,5 +1,7 @@
 package net.limework.rediskript.managers;
 
+import ch.njol.skript.registrations.Classes;
+import ch.njol.skript.variables.Variables;
 import net.limework.rediskript.RediSkript;
 import net.limework.rediskript.events.RedisMessageEvent;
 import net.limework.rediskript.data.Encryption;
@@ -13,9 +15,11 @@ import redis.clients.jedis.BinaryJedis;
 import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import javax.crypto.IllegalBlockSizeException;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -98,6 +102,9 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
 
 
             } catch (Exception e) {
+                if (isShuttingDown.get() || !plugin.isEnabled()) {
+                    return;
+                }
                 plugin.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&cConnection to redis has failed! &cReconnecting..."));
                 if (this.subscribeJedis != null) {
                     this.subscribeJedis.close();
@@ -128,23 +135,40 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                 //encryption is disabled, so let's just get the string
                 receivedMessage = new String(message, StandardCharsets.UTF_8);
             }
-
             if (receivedMessage != null) {
                 JSONObject j = new JSONObject(receivedMessage);
-                //System.out.println("Message got from channel: "+channel +" and the Message: " +json.toString());
-                JSONArray messages = j.getJSONArray("Messages");
-                RedisMessageEvent event;
-                for (int i = 0 ; i < messages.length(); i++) {
+                if (j.get("Type").equals("Skript")) {
+                    JSONArray messages = j.getJSONArray("Messages");
+                    RedisMessageEvent event;
+                    for (int i = 0; i < messages.length(); i++) {
+                        event = new RedisMessageEvent(channelString, messages.get(i).toString(), j.getLong("Date"));
+                        //if plugin is disabling, don't call events anymore
+                        if (plugin.isEnabled()) {
+                            RedisMessageEvent finalEvent = event;
+                            Bukkit.getScheduler().runTask(plugin, () -> plugin.getServer().getPluginManager().callEvent(finalEvent));
+                        }
+                    }
+                } else if (j.get("Type").equals("SkriptVariables")) {
+                    JSONArray variableNames = j.getJSONArray("Names");
+                    boolean delete = false;
+                    Object inputValue = null;
+                    if (j.isNull("Value")) {
+                        delete = true;
+                    } else {
+                        String input = j.getString("Value");
+                        String [] inputs = input.split("\\^", 2);
+                        inputValue = Classes.deserialize(inputs[0], Base64.getDecoder().decode(inputs[1]));
 
-                    System.out.println(messages.get(i).toString());
-                    event = new RedisMessageEvent(channelString, messages.get(i).toString(), j.getLong("Date"));
-                    if (plugin.isEnabled()) {
-                        RedisMessageEvent finalEvent = event;
-                        Bukkit.getScheduler().runTask(plugin, () -> plugin.getServer().getPluginManager().callEvent(finalEvent));
+
+                    }
+                    for (int i = 0; i < variableNames.length(); i++) {
+                        if (delete) {
+                            Variables.setVariable(variableNames.get(i).toString(), null, null, false);
+                        } else {
+                            Variables.setVariable(variableNames.get(i).toString(), inputValue, null, false);
+                        }
                     }
                 }
-
-                //if plugin is disabling, don't call events anymore
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -152,6 +176,50 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
             Bukkit.getLogger().warning(receivedMessage);
         }
 
+    }
+    public void sendMessage(String[] message, String channel) {
+        JSONObject json = new JSONObject();
+        json.put("Messages", new JSONArray(message));
+        json.put("Type", "Skript");
+        json.put("Date", System.currentTimeMillis()); //for unique string every time & PING calculations
+        finishSendMessage(json, channel);
+    }
+    public void sendVariables(String[] variableNames, String variableValue, String channel) {
+        JSONObject json = new JSONObject();
+        json.put("Names", new JSONArray(variableNames));
+        json.put("Value", variableValue);
+        json.put("Type", "SkriptVariables");
+        json.put("Date", System.currentTimeMillis()); //for unique string every time & PING calculations
+        finishSendMessage(json, channel);
+    }
+
+    public void finishSendMessage(JSONObject json, String channel) {
+        try {
+            byte[] message;
+            if (this.getEncryption().isEncryptionEnabled()) {
+                message = this.getEncryption().encrypt(json.toString());
+            } else {
+                message = json.toString().getBytes(StandardCharsets.UTF_8);
+            }
+            //execute sending of redis message on the main thread if plugin is disabling
+            //so it can still process the sending
+
+            //sending a redis message blocks main thread if there's no more connections available
+            //so to avoid issues, it's best to do it always on separate thread
+            if (plugin.isEnabled()) {
+                this.getRedisService().execute(() -> {
+                    BinaryJedis j = this.getJedisPool().getResource();
+                    j.publish(channel.getBytes(StandardCharsets.UTF_8), message);
+                    j.close();
+                });
+            } else {
+                BinaryJedis j = this.getJedisPool().getResource();
+                j.publish(channel.getBytes(StandardCharsets.UTF_8), message);
+                j.close();
+            }
+        } catch (JedisConnectionException exception) {
+            exception.printStackTrace();
+        }
     }
 
     public void shutdown() {
