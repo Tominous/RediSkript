@@ -70,7 +70,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
 
     @Override
     public void run() {
-        while (!isShuttingDown.get()) {
+        while (!isShuttingDown.get() && plugin.isEnabled()) {
             try {
                 plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&cConnecting to redis..."));
                 if (!this.subscribeJedis.isConnected()) this.subscribeJedis = this.jedisPool.getResource();
@@ -155,6 +155,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
             this.subscribeJedis.getClient().close();
             this.jedisPool.getResource().close();
         }
+        isShuttingDown.set(true);
         this.RedisReconnector.shutdown();
         this.RedisService.shutdown();
         this.RedisService = null;
