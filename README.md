@@ -1,7 +1,3 @@
-**To-do List**
-1. Fix memory leak of /reloadredis (Not yet known how to fix it, it can be easily noticed by changing IP addresses and using NetworkInterceptor plugin, it'll show connections still being done to old IP address, aswell as the new one, even if it doesn't use old IP address for anything.)
-
-
 RediSkript allows you to communicate between your servers with use of Redis, it's very fast and easy to use.
 
 You can transfer any data in the form of text between your servers, you can program it to execute a set of instructions on the server depending on the redis message, etc. This can be used for making scripts that sync data between all servers and much more!
