@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.Configuration;
 import org.cryptomator.siv.UnauthenticCiphertextException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import redis.clients.jedis.BinaryJedis;
 import redis.clients.jedis.BinaryJedisPubSub;
@@ -131,13 +132,19 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
             if (receivedMessage != null) {
                 JSONObject j = new JSONObject(receivedMessage);
                 //System.out.println("Message got from channel: "+channel +" and the Message: " +json.toString());
-                RedisMessageEvent event = new RedisMessageEvent(channelString, j.getString("Message"), j.getLong("Date"));
+                JSONArray messages = j.getJSONArray("Messages");
+                RedisMessageEvent event;
+                for (int i = 0 ; i < messages.length(); i++) {
+
+                    System.out.println(messages.get(i).toString());
+                    event = new RedisMessageEvent(channelString, messages.get(i).toString(), j.getLong("Date"));
+                    if (plugin.isEnabled()) {
+                        RedisMessageEvent finalEvent = event;
+                        Bukkit.getScheduler().runTask(plugin, () -> plugin.getServer().getPluginManager().callEvent(finalEvent));
+                    }
+                }
 
                 //if plugin is disabling, don't call events anymore
-
-                if (plugin.isEnabled()) {
-                    Bukkit.getScheduler().runTask(plugin, () -> plugin.getServer().getPluginManager().callEvent(event));
-                }
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -10,6 +10,7 @@ import net.limework.rediskript.managers.RedisManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.Event;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import redis.clients.jedis.BinaryJedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
@@ -18,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 
 public class EffSendMessage extends Effect {
     static {
-        Skript.registerEffect(EffSendMessage.class, "send redis message %string% to [channel] %string%");
+        Skript.registerEffect(EffSendMessage.class, "send redis message[s] %strings% to [channel] %string%");
     }
 
 
@@ -31,10 +32,10 @@ public class EffSendMessage extends Effect {
 
         RediSkript plugin = (RediSkript) Bukkit.getPluginManager().getPlugin("RediSkript");
 
-        String message = this.message.getSingle(event);
+        String[] message = this.message.getAll(event);
         String channel = this.channel.getSingle(event);
 
-        if (message == null) {
+        if (message[0] == null) {
             Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cRedis message was empty. Please check your code."));
             return;
         }
@@ -44,7 +45,7 @@ public class EffSendMessage extends Effect {
         }
         assert plugin != null;
         JSONObject json = new JSONObject();
-        json.put("Message", message);
+        json.put("Messages", new JSONArray(message));
         json.put("Type", "Skript");
         json.put("Date", System.currentTimeMillis()); //for unique string every time & PING calculations
         byte[] msg;
