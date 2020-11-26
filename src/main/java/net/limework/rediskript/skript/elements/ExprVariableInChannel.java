@@ -1,11 +1,12 @@
 package net.limework.rediskript.skript.elements;
 
 import ch.njol.skript.classes.Changer;
-import ch.njol.skript.lang.*;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.Variable;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.variables.SerializedVariable;
-import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import net.limework.rediskript.RediSkript;
@@ -19,6 +20,13 @@ public class ExprVariableInChannel extends SimpleExpression<Object> {
     private Expression<String> channel;
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parser) {
+        if (expressions[0] instanceof Variable) {
+            Variable<?> variable = (Variable<?>) expressions[0];
+            System.out.println(variable.getName().toString());
+            String var = variable.getName().toString();
+            var = var.substring(1, var.length() - 1);
+
+        }
         name = (Expression<String>) expressions[0];
         channel = (Expression<String>) expressions[1];
         return true;
@@ -32,7 +40,7 @@ public class ExprVariableInChannel extends SimpleExpression<Object> {
 
     @Override
     public boolean isSingle() {
-        return false;
+        return true;
     }
 
     @Override
@@ -42,20 +50,32 @@ public class ExprVariableInChannel extends SimpleExpression<Object> {
 
     @Override
     public String toString(Event event, boolean b) {
-        return null;
+        return "variable in redis channel";
     }
     @Override
     public void change(Event e, Object[] changer, Changer.ChangeMode mode) {
         RediSkript plugin = (RediSkript) Bukkit.getPluginManager().getPlugin("RediSkript");
         switch (mode) {
+            case ADD:
             case SET:
-                SerializedVariable.Value serialized = Classes.serialize(changer[0]);
-                String encoded = Base64.getEncoder().encodeToString(serialized.data);
-                encoded = serialized.type + "^" + encoded;
-                plugin.getRm().sendVariables(name.getAll(e), encoded, channel.getSingle(e));
+            case REMOVE:
+                SerializedVariable.Value serialized;
+                String encoded;
+                String[] values = new String[changer.length+1];
+                for( int i = 0; i < changer.length; i++) {
+                    if (changer[i] != null) {
+                        serialized = Classes.serialize(changer[i]);
+                        encoded = Base64.getEncoder().encodeToString(serialized.data);
+                        encoded = serialized.type + "^" + encoded;
+                        values[i] = encoded;
+                    }
+                }
+                String operation = mode.toString();
+                System.out.println(operation);
+                plugin.getRm().sendVariables(name.getAll(e), values, channel.getSingle(e), operation);
                 break;
             case DELETE:
-                plugin.getRm().sendVariables(name.getAll(e), null, channel.getSingle(e));
+                plugin.getRm().sendVariables(name.getAll(e), null, channel.getSingle(e), "SET");
                 break;
         }
     }

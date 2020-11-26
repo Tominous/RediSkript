@@ -19,7 +19,7 @@ public class SkriptHook {
         try {
             addon.loadClasses("net.limework.rediskript.skript", "elements");
             Skript.registerEvent("redis message", EvtRedis.class, RedisMessageEvent.class, "redis message");
-            Skript.registerExpression(ExprVariableInChannel.class, Object.class, ExpressionType.PROPERTY, "variable %strings% in [redis] channel %string%");
+            Skript.registerExpression(ExprVariableInChannel.class, Object.class, ExpressionType.PROPERTY, "variable[s] %strings% in [redis] channel %string%");
 
             Skript.registerExpression(ExprChannel.class, String.class, ExpressionType.SIMPLE, "redis channel");
             EventValues.registerEventValue(RedisMessageEvent.class, String.class, new Getter<String, RedisMessageEvent>() {

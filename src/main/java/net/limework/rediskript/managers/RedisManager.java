@@ -3,8 +3,8 @@ package net.limework.rediskript.managers;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.variables.Variables;
 import net.limework.rediskript.RediSkript;
-import net.limework.rediskript.events.RedisMessageEvent;
 import net.limework.rediskript.data.Encryption;
+import net.limework.rediskript.events.RedisMessageEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.Configuration;
@@ -149,22 +149,65 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                         }
                     }
                 } else if (j.get("Type").equals("SkriptVariables")) {
+
+                    //Transfer variables between servers
+
                     JSONArray variableNames = j.getJSONArray("Names");
-                    boolean delete = false;
-                    Object inputValue = null;
-                    if (j.isNull("Value")) {
-                        delete = true;
-                    } else {
-                        String input = j.getString("Value");
-                        String [] inputs = input.split("\\^", 2);
-                        inputValue = Classes.deserialize(inputs[0], Base64.getDecoder().decode(inputs[1]));
-
-
+                    Object inputValue;
+                    String changeValue = null;
+                    JSONArray variableValues = null;
+                    if (!j.isNull("Values")) {
+                        variableValues = j.getJSONArray("Values");
                     }
                     for (int i = 0; i < variableNames.length(); i++) {
-                        if (delete) {
-                            Variables.setVariable(variableNames.get(i).toString(), null, null, false);
+
+                        if (j.isNull("Values")) {
+                            //only check for SET here, because null has to be ignored in all other cases
+
+                            if (j.getString("Operation").equals("SET")) {
+                                Variables.setVariable(variableNames.get(i).toString(), null, null, false);
+                            }
+
                         } else {
+                            if (!variableValues.isNull(i)) {
+                                changeValue = variableValues.get(i).toString();
+                            }
+                            String[] inputs = changeValue.split("\\^", 2);
+                            inputValue = Classes.deserialize(inputs[0], Base64.getDecoder().decode(inputs[1]));
+
+                            //operations ARE UNFINISHED. because I do not yet know how to handle all the Long/Double conversions without issues.
+
+                            //first check if the variable is set
+
+                            if (Variables.getVariable(variableNames.get(i).toString(), null, false) != null) {
+
+                                //add to variable
+
+                                if (j.getString("Operation").equals("ADD")) {
+                                    if (inputValue.getClass().getName().equals("java.lang.Long")) {
+                                        inputValue = (Long) inputValue + (Long) Variables.getVariable(variableNames.get(i).toString(), null, false);
+                                    } else if (inputValue.getClass().getName().equals("java.lang.Double")) {
+                                        inputValue = (Double) inputValue + (Double) Variables.getVariable(variableNames.get(i).toString(), null, false);
+                                    }
+
+                                //remove from variable
+
+                                } else if (j.getString("Operation").equals("REMOVE")) {
+
+                                    if (inputValue.getClass().getName().equals("java.lang.Long")) {
+                                        inputValue = (Long) Variables.getVariable(variableNames.get(i).toString(), null, false) - (Long) inputValue;
+                                    } else if (inputValue.getClass().getName().equals("java.lang.Double")) {
+                                        inputValue = (Double) Variables.getVariable(variableNames.get(i).toString(), null, false) - (Double) inputValue;
+                                    }
+                                }
+                            //if variable isn't set and removing, we ned it to properly convert this
+                            } else if (j.getString("Operation").equals("REMOVE")) {
+                                if (inputValue.getClass().getName().equals("java.lang.Long")) {
+                                    inputValue = -(Long) inputValue;
+                                } else if (inputValue.getClass().getName().equals("java.lang.Double")) {
+                                    inputValue = -(Double) inputValue;
+                                }
+                            }
                             Variables.setVariable(variableNames.get(i).toString(), inputValue, null, false);
                         }
                     }
@@ -184,12 +227,16 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
         json.put("Date", System.currentTimeMillis()); //for unique string every time & PING calculations
         finishSendMessage(json, channel);
     }
-    public void sendVariables(String[] variableNames, String variableValue, String channel) {
+    public void sendVariables(String[] variableNames, String[] variableValues, String channel, String operation) {
         JSONObject json = new JSONObject();
         json.put("Names", new JSONArray(variableNames));
-        json.put("Value", variableValue);
+        if (variableValues != null) {
+            json.put("Values", new JSONArray(variableValues));
+        }
+
         json.put("Type", "SkriptVariables");
         json.put("Date", System.currentTimeMillis()); //for unique string every time & PING calculations
+        json.put("Operation", operation);
         finishSendMessage(json, channel);
     }
 
