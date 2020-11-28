@@ -4,7 +4,8 @@ You can transfer any data in the form of text between your servers, you can prog
 
 
 It is originally developed by the team of Govindas Limework developers and is now maintained only by Govindas.
-Example:
+
+Redis Message:
 ```
 on redis message:
   if redis channel is "world":
@@ -16,8 +17,23 @@ command /sendredis <text> <text>:
     send redis message arg 1 to channel arg 2
     send redis message "hello world!" to channel "world"
 ```
+Managing variables:
+```
+set variables "test::1", "test::2", "test::3" in channel "global" to 100
+#then use this in any server that listens to "global" redis channel and was online when the above line was executed:
+send "%{test::*}%" #outputs 100, 100 and 100
 
-and that's all there is to this addon! You only need to have matching configuration in every server for communication and a Redis server to connect to. I recommend using VPS for hosting redis server, I personally use VPS from humbleservers.com.
+delete variables "test::*" in channel "global"
+
+set variable "test::%uuid of player%" in channel "playerdata" to tool of player
+#then you can in any server that is listening to "playerdata" channel and was online when the above line was executed:
+give {test::%uuid of player%} to player
+```
+Syntax:
+```
+variable[s] %strings% in [redis] [channel] %string%
+```
+You only need to have matching configuration in every server for communication and a Redis server to connect to. I recommend using VPS for hosting redis server, I personally use VPS from humbleservers.com.
 
 Configuration:
 ```
