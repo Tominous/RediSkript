@@ -174,41 +174,21 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                             }
                             String[] inputs = changeValue.split("\\^", 2);
                             inputValue = Classes.deserialize(inputs[0], Base64.getDecoder().decode(inputs[1]));
-
-                            //operations ARE UNFINISHED. because I do not yet know how to handle all the Long/Double conversions without issues.
-
-                            //first check if the variable is set
-
-                            if (Variables.getVariable(variableNames.get(i).toString(), null, false) != null) {
-
-                                //add to variable
-
-                                if (j.getString("Operation").equals("ADD")) {
-                                    if (inputValue.getClass().getName().equals("java.lang.Long")) {
-                                        inputValue = (Long) inputValue + (Long) Variables.getVariable(variableNames.get(i).toString(), null, false);
-                                    } else if (inputValue.getClass().getName().equals("java.lang.Double")) {
-                                        inputValue = (Double) inputValue + (Double) Variables.getVariable(variableNames.get(i).toString(), null, false);
-                                    }
-
-                                //remove from variable
-
-                                } else if (j.getString("Operation").equals("REMOVE")) {
-
-                                    if (inputValue.getClass().getName().equals("java.lang.Long")) {
-                                        inputValue = (Long) Variables.getVariable(variableNames.get(i).toString(), null, false) - (Long) inputValue;
-                                    } else if (inputValue.getClass().getName().equals("java.lang.Double")) {
-                                        inputValue = (Double) Variables.getVariable(variableNames.get(i).toString(), null, false) - (Double) inputValue;
-                                    }
-                                }
-                            //if variable isn't set and removing, we ned it to properly convert this
-                            } else if (j.getString("Operation").equals("REMOVE")) {
-                                if (inputValue.getClass().getName().equals("java.lang.Long")) {
-                                    inputValue = -(Long) inputValue;
-                                } else if (inputValue.getClass().getName().equals("java.lang.Double")) {
-                                    inputValue = -(Double) inputValue;
-                                }
+                            switch (j.getString("Operation")) {
+                                case "ADD":
+                                    //I will add this once someone tells me how to remove from Skript variable
+                                    //because using SET operation has issues with inconvertible types (Double and Long)
+                                    //variable = (Variable) Variables.getVariable(variableNames.get(i).toString(), null, false);
+                                    // variable.change(null, (Object[]) inputValue, Changer.ChangeMode.REMOVE);
+                                case "REMOVE":
+                                    //I will add this once someone tells me how to remove from Skript variable
+                                    //because using SET operation has issues with inconvertible types (Double and Long)
+                                    //variable = (Variable) Variables.getVariable(variableNames.get(i).toString(), null, false);
+                                   // variable.change(null, (Object[]) inputValue, Changer.ChangeMode.REMOVE);
+                                    break;
+                                case "SET":
+                                    Variables.setVariable(variableNames.get(i).toString(), inputValue, null, false);
                             }
-                            Variables.setVariable(variableNames.get(i).toString(), inputValue, null, false);
                         }
                     }
                 }

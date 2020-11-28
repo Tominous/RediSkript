@@ -6,16 +6,9 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
 import ch.njol.util.Kleenean;
 import net.limework.rediskript.RediSkript;
-import net.limework.rediskript.managers.RedisManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.Event;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import redis.clients.jedis.BinaryJedis;
-import redis.clients.jedis.exceptions.JedisConnectionException;
-
-import java.nio.charset.StandardCharsets;
 
 public class EffSendMessage extends Effect {
     static {

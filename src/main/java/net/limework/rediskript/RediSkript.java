@@ -1,14 +1,12 @@
 package net.limework.rediskript;
+
 import net.limework.rediskript.commands.CommandReloadRedis;
-import net.limework.rediskript.skript.SkriptHook;
 import net.limework.rediskript.managers.RedisManager;
-import org.bukkit.Bukkit;
+import net.limework.rediskript.skript.SkriptHook;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.concurrent.TimeUnit;
 
 public class RediSkript extends JavaPlugin {
 
