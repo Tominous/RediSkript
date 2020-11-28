@@ -33,6 +33,9 @@ Syntax:
 ```
 variable[s] %strings% in [redis] [channel] %string%
 ```
+
+There is only one command: /reloadredis it fully reloads the configuration, you can reload IP, password, channels and everything else.
+
 You only need to have matching configuration in every server for communication and a Redis server to connect to. I recommend using VPS for hosting redis server, I personally use VPS from humbleservers.com.
 
 Configuration:
