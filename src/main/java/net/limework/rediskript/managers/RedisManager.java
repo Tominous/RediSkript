@@ -62,8 +62,8 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
         RedisService = Executors.newSingleThreadExecutor();
         try {
             this.subscribeJedis = this.jedisPool.getResource();
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
+
         this.channels = config.getStringList("Channels");
         encryption = new Encryption(config);
 
@@ -80,8 +80,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                 plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&cConnecting to redis..."));
                 if (!this.subscribeJedis.isConnected()) this.subscribeJedis = this.jedisPool.getResource();
                 plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&aRedis connected!"));
-                int byteArr2dSize = 1;
-                byte[][] channelsInByte = new byte[channels.size()][byteArr2dSize];
+                byte[][] channelsInByte = new byte[channels.size()][1];
                 for (int x = 0; x < channels.size(); x++) {
                     channelsInByte[x] = channels.get(x).getBytes(StandardCharsets.UTF_8);
                 }
@@ -241,14 +240,17 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
         if (this.subscribeJedis != null) {
             this.unsubscribe();
             this.subscribeJedis.close();
-            this.subscribeJedis.getClient().close();
-            this.jedisPool.getResource().close();
         }
-        isShuttingDown.set(true);
+
+        if (this.jedisPool != null) {
+            jedisPool.close();
+            jedisPool = null;
+        }
         this.RedisReconnector.shutdown();
         this.RedisService.shutdown();
         this.RedisService = null;
         this.RedisReconnector = null;
+        encryption = null;
 
     }
     public void reload() {

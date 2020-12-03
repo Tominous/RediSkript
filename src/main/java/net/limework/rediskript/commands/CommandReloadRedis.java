@@ -22,7 +22,7 @@ public class CommandReloadRedis implements CommandExecutor {
         }
         plugin.getRedisManager().reload();
         //not sending to sender, because this command can only be executed via console
-        Bukkit.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&eReloaded via command! Note this command is not stable, it should only be used in urgent cases where you absolutely need to change config details without restarting the server."));
+        Bukkit.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&eReloaded channels, encryption and login details!"));
 
         return false;
     }
