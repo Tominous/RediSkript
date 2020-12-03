@@ -35,7 +35,7 @@ public class EffSendMessage extends Effect {
             Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&2[&aRediSkript&a] &cChannel was empty. Please check your code."));
             return;
         }
-        plugin.getRm().sendMessage(message, channel);
+        plugin.getRedisManager().sendMessage(message, channel);
     }
 
     @Override

@@ -44,8 +44,8 @@ public class ExprVariableInChannel extends SimpleExpression<Object> {
     }
 
     @Override
-    public String toString(Event event, boolean b) {
-        return "variable in redis channel";
+    public String toString(Event event, boolean debug) {
+        return "variable " + name.toString(event,debug) + " in redis channel " + channel.toString(event, debug);
     }
     @Override
     public void change(Event e, Object[] changer, Changer.ChangeMode mode) {
@@ -66,10 +66,10 @@ public class ExprVariableInChannel extends SimpleExpression<Object> {
                     }
                 }
                 String operation = mode.toString();
-                plugin.getRm().sendVariables(name.getAll(e), values, channel.getSingle(e), operation);
+                plugin.getRedisManager().sendVariables(name.getAll(e), values, channel.getSingle(e), operation);
                 break;
             case DELETE:
-                plugin.getRm().sendVariables(name.getAll(e), null, channel.getSingle(e), "SET");
+                plugin.getRedisManager().sendVariables(name.getAll(e), null, channel.getSingle(e), "SET");
                 break;
         }
     }

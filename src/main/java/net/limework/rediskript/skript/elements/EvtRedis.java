@@ -14,10 +14,7 @@ public class EvtRedis extends SkriptEvent {
 
     @Override
     public boolean check(Event event) {
-        if (!(event instanceof RedisMessageEvent)) {
-            return false;
-        }
-        return true;
+        return (event instanceof RedisMessageEvent);
     }
 
     @Override

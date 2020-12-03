@@ -82,22 +82,9 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                 plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&aRedis connected!"));
                 int byteArr2dSize = 1;
                 byte[][] channelsInByte = new byte[channels.size()][byteArr2dSize];
-                boolean reInitializeByteArray;
-                // Loop that reInitialize array IF array size is not enough
-                do {
-                    reInitializeByteArray = false;
-                    try {
-                        /* Data Initialization for channelsInByte array from List<String> channels */
-                        for (int x = 0; x < channels.size(); x++) {
-                            channelsInByte[x] = channels.get(x).getBytes(StandardCharsets.UTF_8);
-                        }
-                    } catch (ArrayIndexOutOfBoundsException ex) {
-                        reInitializeByteArray = true;
-                        /* Increase the current 2d array size to increase 1 and reinitialize the array*/
-                        byteArr2dSize += 1;
-                        channelsInByte = new byte[channels.size()][byteArr2dSize];
-                    }
-                } while (reInitializeByteArray);
+                for (int x = 0; x < channels.size(); x++) {
+                    channelsInByte[x] = channels.get(x).getBytes(StandardCharsets.UTF_8);
+                }
                 this.subscribeJedis.subscribe(this, channelsInByte);
 
 
@@ -228,8 +215,6 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
             } else {
                 message = json.toString().getBytes(StandardCharsets.UTF_8);
             }
-            //execute sending of redis message on the main thread if plugin is disabling
-            //so it can still process the sending
 
             //sending a redis message blocks main thread if there's no more connections available
             //so to avoid issues, it's best to do it always on separate thread
@@ -240,6 +225,8 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                     j.close();
                 });
             } else {
+                //execute sending of redis message on the main thread if plugin is disabling
+                //so it can still process the sending
                 BinaryJedis j = this.getJedisPool().getResource();
                 j.publish(channel.getBytes(StandardCharsets.UTF_8), message);
                 j.close();

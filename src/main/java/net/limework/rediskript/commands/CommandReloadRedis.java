@@ -7,7 +7,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 public class CommandReloadRedis implements CommandExecutor {
     private RediSkript plugin;
     public CommandReloadRedis(RediSkript plugin) {
@@ -21,7 +20,7 @@ public class CommandReloadRedis implements CommandExecutor {
                     , "&2[&aRediSkript&2] &cThis command can only be executed in console.")));
             return true;
         }
-        plugin.getRm().reload();
+        plugin.getRedisManager().reload();
         //not sending to sender, because this command can only be executed via console
         Bukkit.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&eReloaded via command! Note this command is not stable, it should only be used in urgent cases where you absolutely need to change config details without restarting the server."));
 
