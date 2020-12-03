@@ -31,8 +31,6 @@ public class RediSkript extends JavaPlugin {
     }
 
     @Override
-    //using HIGHEST event priority so it shuts down last and code can still execute well in "on script unload" and "on skript unload" events
-    @EventHandler(priority = EventPriority.LOWEST)
     public void onDisable() {
         if (rm != null) {
             rm.shutdown();

@@ -1,9 +1,12 @@
 package net.limework.rediskript.skript.elements;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
+import ch.njol.skript.lang.Variable;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.variables.SerializedVariable;
 import ch.njol.util.Kleenean;
@@ -19,13 +22,6 @@ public class ExprVariableInChannel extends SimpleExpression<Object> {
     private Expression<String> channel;
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, SkriptParser.ParseResult parser) {
-       //if (expressions[0] instanceof Variable) {
-       //    Variable<?> variable = (Variable<?>) expressions[0];
-       //    System.out.println(variable.getName().toString());
-       //    String var = variable.getName().toString();
-       //    var = var.substring(1, var.length() - 1);
-
-       //}
         name = (Expression<String>) expressions[0];
         channel = (Expression<String>) expressions[1];
         return true;
