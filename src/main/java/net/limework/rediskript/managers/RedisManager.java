@@ -236,7 +236,9 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
     }
 
     public void shutdown() {
+
         this.isShuttingDown.set(true);
+
         if (this.subscribeJedis != null) {
             this.unsubscribe();
             this.subscribeJedis.close();
@@ -244,13 +246,9 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
 
         if (this.jedisPool != null) {
             jedisPool.close();
-            jedisPool = null;
         }
         this.RedisReconnector.shutdown();
         this.RedisService.shutdown();
-        this.RedisService = null;
-        this.RedisReconnector = null;
-        encryption = null;
 
     }
     public void reload() {

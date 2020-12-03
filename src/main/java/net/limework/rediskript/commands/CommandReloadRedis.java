@@ -7,6 +7,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+
 public class CommandReloadRedis implements CommandExecutor {
     private RediSkript plugin;
     public CommandReloadRedis(RediSkript plugin) {
@@ -20,7 +22,15 @@ public class CommandReloadRedis implements CommandExecutor {
                     , "&2[&aRediSkript&2] &cThis command can only be executed in console.")));
             return true;
         }
-        plugin.getRedisManager().reload();
+
+        //reload redis asynchronously to not lag the main thread (was doing a few seconds lagspike at most)
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                plugin.getRedisManager().reload();
+            }
+        }.runTaskAsynchronously(plugin);
+        
         //not sending to sender, because this command can only be executed via console
         Bukkit.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&eReloaded channels, encryption and login details!"));
 
