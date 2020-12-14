@@ -3,3 +3,7 @@ out
 .idea
 compile
 *.iml
+.idea/jarRepositories.xml
+.idea/libraries/Maven__org_spigotmc_spigot_api_1_16_2_R0_1_SNAPSHOT.xml
+*.iml
+.idea/jarRepositories.xml
