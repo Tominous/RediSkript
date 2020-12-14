@@ -4,8 +4,6 @@ You can transfer any data in the form of text between your servers, you can prog
 
 It is developed and maintained by Govindas & the team of Govindas Limework developers.
 
-~~It is originally developed by the team of Govindas Limework developers and is now maintained only by Govindas.~~
-
 Redis Message:
 ```
 on redis message:
