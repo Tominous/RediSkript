@@ -2,8 +2,7 @@ RediSkript allows you to communicate between your servers with use of Redis, it'
 
 You can transfer any data in the form of text between your servers, you can program it to execute a set of instructions on the server depending on the redis message, etc. This can be used for making scripts that sync data between all servers and much more!
 
-
-It is originally developed by the team of Govindas Limework developers and is now maintained only by Govindas.
+It is developed and maintained by Govindas & the team of Govindas Limework developers.
 
 Redis Message:
 ```

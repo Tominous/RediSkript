@@ -1,4 +1,7 @@
 target
 out
 .idea
+.idea/*
 compile
+*.iml
+
