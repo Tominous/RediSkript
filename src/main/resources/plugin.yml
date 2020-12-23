@@ -1,7 +1,7 @@
 main: net.limework.rediskript.RediSkript
 name: ${project.name}
 version: ${project.version}
-authors: [Govindas, ham1255, DaemonicKing]
+authors: [Govindas, ham1255, DaemonicKing, limework.net]
 api-version: 1.13
 depend: [Skript]
 commands:

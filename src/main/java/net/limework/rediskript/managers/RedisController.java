@@ -8,46 +8,43 @@ import net.limework.rediskript.events.RedisMessageEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.scheduler.BukkitTask;
 import org.cryptomator.siv.UnauthenticCiphertextException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import redis.clients.jedis.BinaryJedis;
-import redis.clients.jedis.BinaryJedisPubSub;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import javax.crypto.IllegalBlockSizeException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class RedisManager extends BinaryJedisPubSub implements Runnable {
-
-    private ExecutorService RedisReconnector;
-    private RediSkript plugin;
-
-    private JedisPool jedisPool;
-    private ExecutorService RedisService;
+public class RedisController extends BinaryJedisPubSub implements Runnable {
 
 
-    //sub
-    private BinaryJedis subscribeJedis;
-    private List<String> channels;
-    private AtomicBoolean isShuttingDown = new AtomicBoolean(false);
-    private Encryption encryption;
+    //Jedis Pool to be used by every another class.
+    private final JedisPool jedisPool;
+
+    //this seems useless unless tls is OFF!
+    private final Encryption encryption;
+
+    private byte[][] channelsInByte;
+
+    private final AtomicBoolean isConnectionBroken;
+    private final RediSkript plugin;
+    private BukkitTask ConnectionTask;
 
 
-    public RedisManager(RediSkript plugin) {
+    public RedisController(RediSkript plugin) {
         this.plugin = plugin;
-        Configuration config = this.plugin.getConfig();
+        Configuration config = plugin.getConfig();
         JedisPoolConfig JConfig = new JedisPoolConfig();
         int maxConnections = config.getInt("Redis.MaxConnections");
-        if (maxConnections < 2) { maxConnections = 2; }
-
+        if (maxConnections < 2) {
+            maxConnections = 2;
+        }
         JConfig.setMaxTotal(maxConnections);
         JConfig.setMaxIdle(maxConnections);
         JConfig.setMinIdle(1);
@@ -58,50 +55,34 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                 config.getInt("Redis.TimeOut"),
                 config.getString("Redis.Password"),
                 config.getBoolean("Redis.useTLS"));
-        RedisReconnector = Executors.newSingleThreadExecutor();
-        RedisService = Executors.newSingleThreadExecutor();
-        try {
-            this.subscribeJedis = this.jedisPool.getResource();
-        } catch (Exception ignored) {}
-
-        this.channels = config.getStringList("Channels");
         encryption = new Encryption(config);
-
-    }
-
-    public void start() {
-        this.RedisReconnector.execute(this);
+        setupChannels(config);
+        isConnectionBroken = new AtomicBoolean(true);
+        //Start the main task on async thread
+        ConnectionTask = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin,this, 0 , 20 * 5 );
     }
 
     @Override
     public void run() {
-        while (!isShuttingDown.get() && plugin.isEnabled()) {
-            try {
-                plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&cConnecting to redis..."));
-                if (!this.subscribeJedis.isConnected()) this.subscribeJedis = this.jedisPool.getResource();
-                plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&aRedis connected!"));
-                byte[][] channelsInByte = new byte[channels.size()][1];
-                for (int x = 0; x < channels.size(); x++) {
-                    channelsInByte[x] = channels.get(x).getBytes(StandardCharsets.UTF_8);
-                }
-                this.subscribeJedis.subscribe(this, channelsInByte);
-
-
-            } catch (Exception e) {
-                if (isShuttingDown.get() || !plugin.isEnabled()) {
-                    return;
-                }
-                plugin.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&cConnection to redis has failed! &cReconnecting..."));
-                if (this.subscribeJedis != null) {
-                    this.subscribeJedis.close();
-                }
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        if (!isConnectionBroken.get()) {
+            return;
         }
+        System.out.println("connecting to redis!");
+        try (Jedis jedis = jedisPool.getResource()) {
+            isConnectionBroken.set(false);
+            System.out.println("connected to redis!");
+            jedis.subscribe(this, channelsInByte);
+
+        } catch (Exception e) {
+            isConnectionBroken.set(true);
+            e.printStackTrace();
+        }
+    }
+
+    public void shutdown() {
+        ConnectionTask.cancel();
+        this.unsubscribe();
+        jedisPool.close();
     }
 
     @Override
@@ -170,7 +151,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
                                     //I will add this once someone tells me how to remove from Skript variable
                                     //because using SET operation has issues with inconvertible types (Double and Long)
                                     //variable = (Variable) Variables.getVariable(variableNames.get(i).toString(), null, false);
-                                   // variable.change(null, (Object[]) inputValue, Changer.ChangeMode.REMOVE);
+                                    // variable.change(null, (Object[]) inputValue, Changer.ChangeMode.REMOVE);
                                     break;
                                 case "SET":
                                     Variables.setVariable(variableNames.get(i).toString(), inputValue, null, false);
@@ -186,6 +167,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
         }
 
     }
+
     public void sendMessage(String[] message, String channel) {
         JSONObject json = new JSONObject();
         json.put("Messages", new JSONArray(message));
@@ -193,6 +175,7 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
         json.put("Date", System.currentTimeMillis()); //for unique string every time & PING calculations
         finishSendMessage(json, channel);
     }
+
     public void sendVariables(String[] variableNames, String[] variableValues, String channel, String operation) {
         JSONObject json = new JSONObject();
         json.put("Names", new JSONArray(variableNames));
@@ -209,8 +192,8 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
     public void finishSendMessage(JSONObject json, String channel) {
         try {
             byte[] message;
-            if (this.getEncryption().isEncryptionEnabled()) {
-                message = this.getEncryption().encrypt(json.toString());
+            if (encryption.isEncryptionEnabled()) {
+                message = encryption.encrypt(json.toString());
             } else {
                 message = json.toString().getBytes(StandardCharsets.UTF_8);
             }
@@ -218,51 +201,39 @@ public class RedisManager extends BinaryJedisPubSub implements Runnable {
             //sending a redis message blocks main thread if there's no more connections available
             //so to avoid issues, it's best to do it always on separate thread
             if (plugin.isEnabled()) {
-                this.getRedisService().execute(() -> {
-                    BinaryJedis j = this.getJedisPool().getResource();
-                    j.publish(channel.getBytes(StandardCharsets.UTF_8), message);
-                    j.close();
+                plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+                    try (BinaryJedis j = jedisPool.getResource()) {
+                        j.publish(channel.getBytes(StandardCharsets.UTF_8), message);
+                    } catch (Exception e) {
+                        System.out.println("Error sending redis message!");
+                        e.printStackTrace();
+                    }
+
                 });
             } else {
                 //execute sending of redis message on the main thread if plugin is disabling
                 //so it can still process the sending
-                BinaryJedis j = this.getJedisPool().getResource();
-                j.publish(channel.getBytes(StandardCharsets.UTF_8), message);
-                j.close();
+                try (BinaryJedis j = jedisPool.getResource()) {
+                    j.publish(channel.getBytes(StandardCharsets.UTF_8), message);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         } catch (JedisConnectionException exception) {
             exception.printStackTrace();
         }
     }
 
-    public void shutdown() {
-
-        this.isShuttingDown.set(true);
-
-        if (this.subscribeJedis != null) {
-            this.unsubscribe();
-            this.subscribeJedis.close();
+    private void setupChannels(Configuration config) {
+        List<String> channels = config.getStringList("Channels");
+        channelsInByte = new byte[channels.size()][1];
+        for (int x = 0; x < channels.size(); x++) {
+            channelsInByte[x] = channels.get(x).getBytes(StandardCharsets.UTF_8);
         }
-
-        if (this.jedisPool != null) {
-            jedisPool.close();
-        }
-        this.RedisReconnector.shutdown();
-        this.RedisService.shutdown();
-
-    }
-    public void reload() {
-        this.shutdown();
-        plugin.startRedis(true);
     }
 
-    public JedisPool getJedisPool() {
-        return jedisPool;
+    public Boolean isRedisConnectionOffline() {
+        return isConnectionBroken.get();
     }
-
-    public Encryption getEncryption() {
-        return encryption;
-    }
-
-    public ExecutorService getRedisService() { return RedisService; }
 }

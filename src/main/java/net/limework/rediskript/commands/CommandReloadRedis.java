@@ -27,10 +27,10 @@ public class CommandReloadRedis implements CommandExecutor {
         new BukkitRunnable() {
             @Override
             public void run() {
-                plugin.getRedisManager().reload();
+                plugin.reloadRedis();
             }
         }.runTaskAsynchronously(plugin);
-        
+
         //not sending to sender, because this command can only be executed via console
         Bukkit.getLogger().info(ChatColor.translateAlternateColorCodes('&', "&eReloaded channels, encryption and login details!"));
 
