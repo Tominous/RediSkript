@@ -10,6 +10,7 @@ import net.limework.rediskript.commands.CommandReloadRedis;
 import net.limework.rediskript.events.RedisMessageEvent;
 import net.limework.rediskript.managers.RedisController;
 import net.limework.rediskript.skript.elements.*;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -18,11 +19,21 @@ public class RediSkript extends JavaPlugin {
 
     private RedisController redisController;
 
-    public void reloadRedis(){
+    public void reloadRedis() {
         redisController.shutdown();
         redisController = new RedisController(this);
     }
 
+    public void sendLogs(String message) {
+        getLogger().info(
+                ChatColor.translateAlternateColorCodes('&', "&b[RediSkript]&e " + message)
+        );
+    }
+    public void sendErrorLogs(String message) {
+        getLogger().severe(
+                ChatColor.translateAlternateColorCodes('&', "&b[RediSkript]&c " + message)
+        );
+    }
 
     public void registerSyntax() {
         SkriptAddon addon = Skript.registerAddon(this);
@@ -69,6 +80,7 @@ public class RediSkript extends JavaPlugin {
     public void onDisable() {
         if (redisController != null) redisController.shutdown();
     }
+
     public RedisController getRC() {
         return redisController;
     }

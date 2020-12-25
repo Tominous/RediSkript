@@ -34,7 +34,7 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
 
     private final AtomicBoolean isConnectionBroken;
     private final RediSkript plugin;
-    private BukkitTask ConnectionTask;
+    private final BukkitTask ConnectionTask;
 
 
     public RedisController(RediSkript plugin) {
@@ -67,15 +67,15 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
         if (!isConnectionBroken.get()) {
             return;
         }
-        System.out.println("connecting to redis!");
+        plugin.sendLogs("Connecting to redis......");
         try (Jedis jedis = jedisPool.getResource()) {
             isConnectionBroken.set(false);
-            System.out.println("connected to redis!");
+            plugin.sendLogs("&aConnection to redis has established!");
             jedis.subscribe(this, channelsInByte);
 
         } catch (Exception e) {
             isConnectionBroken.set(true);
-            e.printStackTrace();
+            plugin.sendLogs("Connection has &kFAILED &cor Unable to connect to redis retrying to make connection...");
         }
     }
 
