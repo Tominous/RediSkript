@@ -26,12 +26,12 @@ public class RediSkript extends JavaPlugin {
 
     public void sendLogs(String message) {
         getLogger().info(
-                ChatColor.translateAlternateColorCodes('&', "&b[RediSkript]&e " + message)
+                ChatColor.translateAlternateColorCodes('&', "&b" + message)
         );
     }
     public void sendErrorLogs(String message) {
         getLogger().severe(
-                ChatColor.translateAlternateColorCodes('&', "&b[RediSkript]&c " + message)
+                ChatColor.translateAlternateColorCodes('&', "&c" + message)
         );
     }
 

@@ -33,6 +33,7 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
     private byte[][] channelsInByte;
 
     private final AtomicBoolean isConnectionBroken;
+    private final AtomicBoolean isConnecting;
     private final RediSkript plugin;
     private final BukkitTask ConnectionTask;
 
@@ -58,30 +59,38 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
         encryption = new Encryption(config);
         setupChannels(config);
         isConnectionBroken = new AtomicBoolean(true);
+        isConnecting = new AtomicBoolean(false);
         //Start the main task on async thread
-        ConnectionTask = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin,this, 0 , 20 * 5 );
+        ConnectionTask = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, this, 0, 20 * 5);
     }
 
     @Override
     public void run() {
-        if (!isConnectionBroken.get()) {
+        if (!isConnectionBroken.get() || isConnecting.get()) {
             return;
         }
         plugin.sendLogs("Connecting to redis......");
+        isConnecting.set(true);
         try (Jedis jedis = jedisPool.getResource()) {
             isConnectionBroken.set(false);
             plugin.sendLogs("&aConnection to redis has established!");
             jedis.subscribe(this, channelsInByte);
-
         } catch (Exception e) {
+            isConnecting.set(false);
             isConnectionBroken.set(true);
             plugin.sendLogs("Connection has &kFAILED &cor Unable to connect to redis retrying to make connection...");
+            e.printStackTrace();
         }
     }
 
     public void shutdown() {
         ConnectionTask.cancel();
-        this.unsubscribe();
+        try {
+            this.unsubscribe();
+        } catch (Exception e) {
+            plugin.sendErrorLogs("Something went wrong during unsubscribing...");
+        }
+
         jedisPool.close();
     }
 
