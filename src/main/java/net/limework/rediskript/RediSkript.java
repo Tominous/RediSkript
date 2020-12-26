@@ -20,6 +20,7 @@ public class RediSkript extends JavaPlugin {
     private RedisController redisController;
 
     public void reloadRedis() {
+        reloadConfig();
         redisController.shutdown();
         redisController = new RedisController(this);
     }
