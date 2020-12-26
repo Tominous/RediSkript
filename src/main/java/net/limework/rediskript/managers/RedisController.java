@@ -79,7 +79,7 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
         } catch (Exception e) {
             isConnecting.set(false);
             isConnectionBroken.set(true);
-            plugin.sendLogs("Connection has &kFAILED &cor Unable to connect to redis retrying to make connection...");
+            plugin.sendErrorLogs("Connection has &lFAILED &cor Unable to connect to redis retrying to make connection...");
             if (debugMode) {
                 e.printStackTrace();
             }
