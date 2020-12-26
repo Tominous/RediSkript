@@ -8,22 +8,33 @@ import ch.njol.skript.util.Date;
 import ch.njol.skript.util.Getter;
 import net.limework.rediskript.commands.CommandReloadRedis;
 import net.limework.rediskript.events.RedisMessageEvent;
-import net.limework.rediskript.managers.RedisManager;
+import net.limework.rediskript.managers.RedisController;
 import net.limework.rediskript.skript.elements.*;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 
 public class RediSkript extends JavaPlugin {
 
-    //Redis manager
-    private RedisManager rm;
+    private RedisController redisController;
 
-    public void startRedis(boolean reload) {
-        if (reload) { reloadConfig(); }
-        rm = new RedisManager(this);
-        rm.start();
+    public void reloadRedis() {
+        redisController.shutdown();
+        redisController = new RedisController(this);
     }
+
+    public void sendLogs(String message) {
+        getLogger().info(
+                ChatColor.translateAlternateColorCodes('&', "&b" + message)
+        );
+    }
+    public void sendErrorLogs(String message) {
+        getLogger().severe(
+                ChatColor.translateAlternateColorCodes('&', "&c" + message)
+        );
+    }
+
     public void registerSyntax() {
         SkriptAddon addon = Skript.registerAddon(this);
         try {
@@ -60,16 +71,17 @@ public class RediSkript extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        startRedis(false);
+        redisController = new RedisController(this);
         getServer().getPluginCommand("reloadredis").setExecutor(new CommandReloadRedis(this));
         registerSyntax();
     }
 
     @Override
     public void onDisable() {
-        if (rm != null) rm.shutdown();
+        if (redisController != null) redisController.shutdown();
     }
-    public RedisManager getRedisManager() {
-        return rm;
+
+    public RedisController getRC() {
+        return redisController;
     }
 }

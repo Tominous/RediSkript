@@ -66,10 +66,10 @@ public class ExprVariableInChannel extends SimpleExpression<Object> {
                     }
                 }
                 String operation = mode.toString();
-                plugin.getRedisManager().sendVariables(name.getAll(e), values, channel.getSingle(e), operation);
+                plugin.getRC().sendVariables(name.getAll(e), values, channel.getSingle(e), operation);
                 break;
             case DELETE:
-                plugin.getRedisManager().sendVariables(name.getAll(e), null, channel.getSingle(e), "SET");
+                plugin.getRC().sendVariables(name.getAll(e), null, channel.getSingle(e), "SET");
                 break;
         }
     }
