@@ -35,6 +35,7 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
     private final AtomicBoolean isConnectionBroken;
     private final AtomicBoolean isConnecting;
     private final RediSkript plugin;
+    private final boolean debugMode = false; //todo: will be later in the config in future release.
     private final BukkitTask ConnectionTask;
 
 
@@ -79,7 +80,9 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
             isConnecting.set(false);
             isConnectionBroken.set(true);
             plugin.sendLogs("Connection has &kFAILED &cor Unable to connect to redis retrying to make connection...");
-            e.printStackTrace();
+            if (debugMode) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -89,6 +92,9 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
             this.unsubscribe();
         } catch (Exception e) {
             plugin.sendErrorLogs("Something went wrong during unsubscribing...");
+            if (debugMode) {
+                e.printStackTrace();
+            }
         }
 
         jedisPool.close();
@@ -170,9 +176,11 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            Bukkit.getLogger().warning(ChatColor.translateAlternateColorCodes('&', "&cI got a message that was empty from channel " + channelString + " please check your code that you used to send the message. Message content:"));
-            Bukkit.getLogger().warning(receivedMessage);
+           plugin.sendErrorLogs("&cI got a message that was empty from channel " + channelString + " please check your code that you used to send the message. Message content:");
+            if (debugMode) {
+                e.printStackTrace();
+                plugin.sendErrorLogs(receivedMessage);
+            }
         }
 
     }
