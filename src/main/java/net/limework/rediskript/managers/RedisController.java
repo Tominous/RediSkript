@@ -223,7 +223,9 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
                         j.publish(channel.getBytes(StandardCharsets.UTF_8), message);
                     } catch (Exception e) {
                         System.out.println("Error sending redis message!");
-                        e.printStackTrace();
+                        if (debugMode) {
+                            e.printStackTrace();
+                        }
                     }
 
                 });
