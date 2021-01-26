@@ -165,7 +165,17 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
                                         // variable.change(null, (Object[]) inputValue, Changer.ChangeMode.REMOVE);
                                         break;
                                     case "SET":
+                                        String variableName = variableNames.get(i).toString();
+                                        
+                                        //this is needed, because setting a {variable::*} causes weird behavior, like
+                                        //1st set operation is no data, 2nd has data, etc.
+                                        //if you set it to null before action, it works correctly
+
+                                        if (variableName.charAt(variableName.length()-1) == '*') {
+                                            Variables.setVariable(variableName, null, null, false);
+                                       }
                                         Variables.setVariable(variableNames.get(i).toString(), inputValue, null, false);
+
                                 }
                             }
                         }
