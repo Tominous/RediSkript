@@ -93,13 +93,13 @@
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>3.4.1</version>
+            <version>3.5.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20190722</version>
+            <version>20201115</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

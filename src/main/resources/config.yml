@@ -8,8 +8,8 @@ Redis:
   #the default Redis port
   Port: 6379
   #time out in milliseconds, how long it should take before it decides that it is unable to connect when sending a message
-  #90000 = 90 seconds
-  TimeOut: 90000
+  #9000 = 9 seconds
+  TimeOut: 9000
   #also known as SSL, only use this if you're running Redis 6.0.6 or higher, older versions will not work correctly
   #it encrypts your traffic and makes data exchange between distant servers completely secure
   useTLS: false

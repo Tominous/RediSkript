@@ -79,7 +79,11 @@ public class RediSkript extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (redisController != null) redisController.shutdown();
+        if (redisController != null) {
+            redisController.shutdown();
+        }
+        getServer().getPluginCommand("reloadredis").setExecutor(null);
+
     }
 
     public RedisController getRC() {

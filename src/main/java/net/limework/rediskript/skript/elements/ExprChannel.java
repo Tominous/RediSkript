@@ -25,9 +25,7 @@ public class ExprChannel extends SimpleExpression<String> {
     }
 
     @Override
-    public String toString(Event event, boolean b) {
-        return "redis channel";
-    }
+    public String toString(Event event, boolean b) { return "redis channel"; }
 
     @Override
     public boolean init(final Expression<?>[] expressions, final int matchedPattern, final Kleenean isDelayed, final SkriptParser.ParseResult parseResult) {

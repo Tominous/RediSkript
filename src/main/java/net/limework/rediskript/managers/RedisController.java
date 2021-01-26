@@ -6,7 +6,6 @@ import net.limework.rediskript.RediSkript;
 import net.limework.rediskript.data.Encryption;
 import net.limework.rediskript.events.RedisMessageEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.scheduler.BukkitTask;
 import org.cryptomator.siv.UnauthenticCiphertextException;
@@ -35,7 +34,6 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
     private final AtomicBoolean isConnectionBroken;
     private final AtomicBoolean isConnecting;
     private final RediSkript plugin;
-    private final boolean debugMode = false; //todo: will be later in the config in future release.
     private final BukkitTask ConnectionTask;
 
 
@@ -44,9 +42,10 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
         Configuration config = plugin.getConfig();
         JedisPoolConfig JConfig = new JedisPoolConfig();
         int maxConnections = config.getInt("Redis.MaxConnections");
-        if (maxConnections < 2) {
-            maxConnections = 2;
-        }
+
+        //do not allow less than 2 max connections as that causes issues
+        if (maxConnections < 2) { maxConnections = 2; }
+
         JConfig.setMaxTotal(maxConnections);
         JConfig.setMaxIdle(maxConnections);
         JConfig.setMinIdle(1);
@@ -70,120 +69,114 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
         if (!isConnectionBroken.get() || isConnecting.get()) {
             return;
         }
-        plugin.sendLogs("Connecting to redis......");
+        plugin.sendLogs("Connecting to Redis server...");
         isConnecting.set(true);
         try (Jedis jedis = jedisPool.getResource()) {
             isConnectionBroken.set(false);
-            plugin.sendLogs("&aConnection to redis has established!");
+            plugin.sendLogs("&aConnection to Redis server has established! Success!");
             jedis.subscribe(this, channelsInByte);
         } catch (Exception e) {
             isConnecting.set(false);
             isConnectionBroken.set(true);
-            plugin.sendErrorLogs("Connection has &lFAILED &cor Unable to connect to redis retrying to make connection...");
-            if (debugMode) {
-                e.printStackTrace();
-            }
+            plugin.sendErrorLogs("Connection to Redis server has failed! Please check your details in the configuration.");
+            e.printStackTrace();
         }
     }
 
     public void shutdown() {
         ConnectionTask.cancel();
-        try {
-            this.unsubscribe();
-        } catch (Exception e) {
-            plugin.sendErrorLogs("Something went wrong during unsubscribing...");
-            if (debugMode) {
+        if (this.isSubscribed()) {
+            try {
+                this.unsubscribe();
+            } catch (Exception e) {
+                plugin.sendErrorLogs("Something went wrong during unsubscribing...");
                 e.printStackTrace();
             }
         }
-
         jedisPool.close();
     }
 
     @Override
-    public void onMessage(byte[] channel, byte[] message) {
-        String channelString = new String(channel, StandardCharsets.UTF_8);
-        String receivedMessage = null;
-        try {
-            //if encryption is enabled, decrypt the message, else just convert binary to string
-            if (this.encryption.isEncryptionEnabled()) {
-                try {
-                    receivedMessage = encryption.decrypt(message);
-                } catch (UnauthenticCiphertextException | IllegalBlockSizeException e) {
-                    e.printStackTrace();
+    public void onMessage(byte[] channel, byte[] message){
+            String channelString = new String(channel, StandardCharsets.UTF_8);
+            String receivedMessage = null;
+            try {
+                //if encryption is enabled, decrypt the message, else just convert binary to string
+                if (this.encryption.isEncryptionEnabled()) {
+                    try {
+                        receivedMessage = encryption.decrypt(message);
+                    } catch (UnauthenticCiphertextException | IllegalBlockSizeException e) {
+                        e.printStackTrace();
+                    }
+
+                } else {
+                    //encryption is disabled, so let's just get the string
+                    receivedMessage = new String(message, StandardCharsets.UTF_8);
                 }
-
-            } else {
-                //encryption is disabled, so let's just get the string
-                receivedMessage = new String(message, StandardCharsets.UTF_8);
-            }
-            if (receivedMessage != null) {
-                JSONObject j = new JSONObject(receivedMessage);
-                if (j.get("Type").equals("Skript")) {
-                    JSONArray messages = j.getJSONArray("Messages");
-                    RedisMessageEvent event;
-                    for (int i = 0; i < messages.length(); i++) {
-                        event = new RedisMessageEvent(channelString, messages.get(i).toString(), j.getLong("Date"));
-                        //if plugin is disabling, don't call events anymore
-                        if (plugin.isEnabled()) {
-                            RedisMessageEvent finalEvent = event;
-                            Bukkit.getScheduler().runTask(plugin, () -> plugin.getServer().getPluginManager().callEvent(finalEvent));
-                        }
-                    }
-                } else if (j.get("Type").equals("SkriptVariables")) {
-
-                    //Transfer variables between servers
-
-                    JSONArray variableNames = j.getJSONArray("Names");
-                    Object inputValue;
-                    String changeValue = null;
-                    JSONArray variableValues = null;
-                    if (!j.isNull("Values")) {
-                        variableValues = j.getJSONArray("Values");
-                    }
-                    for (int i = 0; i < variableNames.length(); i++) {
-
-                        if (j.isNull("Values")) {
-                            //only check for SET here, because null has to be ignored in all other cases
-
-                            if (j.getString("Operation").equals("SET")) {
-                                Variables.setVariable(variableNames.get(i).toString(), null, null, false);
-                            }
-
-                        } else {
-                            if (!variableValues.isNull(i)) {
-                                changeValue = variableValues.get(i).toString();
-                            }
-                            String[] inputs = changeValue.split("\\^", 2);
-                            inputValue = Classes.deserialize(inputs[0], Base64.getDecoder().decode(inputs[1]));
-                            switch (j.getString("Operation")) {
-                                case "ADD":
-                                    //I will add this once someone tells me how to remove from Skript variable
-                                    //because using SET operation has issues with inconvertible types (Double and Long)
-                                    //variable = (Variable) Variables.getVariable(variableNames.get(i).toString(), null, false);
-                                    // variable.change(null, (Object[]) inputValue, Changer.ChangeMode.REMOVE);
-                                case "REMOVE":
-                                    //I will add this once someone tells me how to remove from Skript variable
-                                    //because using SET operation has issues with inconvertible types (Double and Long)
-                                    //variable = (Variable) Variables.getVariable(variableNames.get(i).toString(), null, false);
-                                    // variable.change(null, (Object[]) inputValue, Changer.ChangeMode.REMOVE);
-                                    break;
-                                case "SET":
-                                    Variables.setVariable(variableNames.get(i).toString(), inputValue, null, false);
+                if (receivedMessage != null) {
+                    JSONObject j = new JSONObject(receivedMessage);
+                    if (j.get("Type").equals("Skript")) {
+                        JSONArray messages = j.getJSONArray("Messages");
+                        RedisMessageEvent event;
+                        for (int i = 0; i < messages.length(); i++) {
+                            event = new RedisMessageEvent(channelString, messages.get(i).toString(), j.getLong("Date"));
+                            //if plugin is disabling, don't call events anymore
+                            if (plugin.isEnabled()) {
+                                RedisMessageEvent finalEvent = event;
+                                Bukkit.getScheduler().runTask(plugin, () -> plugin.getServer().getPluginManager().callEvent(finalEvent));
                             }
                         }
+                    } else if (j.get("Type").equals("SkriptVariables")) {
+
+                        //Transfer variables between servers
+
+                        JSONArray variableNames = j.getJSONArray("Names");
+                        Object inputValue;
+                        String changeValue = null;
+                        JSONArray variableValues = null;
+                        if (!j.isNull("Values")) {
+                            variableValues = j.getJSONArray("Values");
+                        }
+                        for (int i = 0; i < variableNames.length(); i++) {
+
+                            if (j.isNull("Values")) {
+                                //only check for SET here, because null has to be ignored in all other cases
+
+                                if (j.getString("Operation").equals("SET")) {
+                                    Variables.setVariable(variableNames.get(i).toString(), null, null, false);
+                                }
+
+                            } else {
+                                if (!variableValues.isNull(i)) {
+                                    changeValue = variableValues.get(i).toString();
+                                }
+                                String[] inputs = changeValue.split("\\^", 2);
+                                inputValue = Classes.deserialize(inputs[0], Base64.getDecoder().decode(inputs[1]));
+                                switch (j.getString("Operation")) {
+                                    case "ADD":
+                                        //I will add this once someone tells me how to remove from Skript variable
+                                        //because using SET operation has issues with inconvertible types (Double and Long)
+                                        //variable = (Variable) Variables.getVariable(variableNames.get(i).toString(), null, false);
+                                        // variable.change(null, (Object[]) inputValue, Changer.ChangeMode.REMOVE);
+                                    case "REMOVE":
+                                        //I will add this once someone tells me how to remove from Skript variable
+                                        //because using SET operation has issues with inconvertible types (Double and Long)
+                                        //variable = (Variable) Variables.getVariable(variableNames.get(i).toString(), null, false);
+                                        // variable.change(null, (Object[]) inputValue, Changer.ChangeMode.REMOVE);
+                                        break;
+                                    case "SET":
+                                        Variables.setVariable(variableNames.get(i).toString(), inputValue, null, false);
+                                }
+                            }
+                        }
                     }
                 }
-            }
-        } catch (Exception e) {
-           plugin.sendErrorLogs("&cI got a message that was empty from channel " + channelString + " please check your code that you used to send the message. Message content:");
-            if (debugMode) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                plugin.sendErrorLogs("&cI got a message that was empty from channel " + channelString + " please check your code that you used to send the message. Message content:");
                 plugin.sendErrorLogs(receivedMessage);
+                e.printStackTrace();
             }
         }
-
-    }
 
     public void sendMessage(String[] message, String channel) {
         JSONObject json = new JSONObject();
@@ -222,12 +215,9 @@ public class RedisController extends BinaryJedisPubSub implements Runnable {
                     try (BinaryJedis j = jedisPool.getResource()) {
                         j.publish(channel.getBytes(StandardCharsets.UTF_8), message);
                     } catch (Exception e) {
-                        System.out.println("Error sending redis message!");
-                        if (debugMode) {
-                            e.printStackTrace();
+                        plugin.sendErrorLogs("Error sending redis message!");
+                        e.printStackTrace();
                         }
-                    }
-
                 });
             } else {
                 //execute sending of redis message on the main thread if plugin is disabling

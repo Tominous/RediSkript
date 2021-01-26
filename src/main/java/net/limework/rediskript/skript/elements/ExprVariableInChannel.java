@@ -1,12 +1,9 @@
 package net.limework.rediskript.skript.elements;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser;
-import ch.njol.skript.lang.Variable;
 import ch.njol.skript.lang.util.SimpleExpression;
-import ch.njol.skript.log.ErrorQuality;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.variables.SerializedVariable;
 import ch.njol.util.Kleenean;
@@ -49,7 +46,7 @@ public class ExprVariableInChannel extends SimpleExpression<Object> {
     }
     @Override
     public void change(Event e, Object[] changer, Changer.ChangeMode mode) {
-        RediSkript plugin = (RediSkript) Bukkit.getPluginManager().getPlugin("RediSkript");
+        RediSkript plugin = RediSkript.getPlugin(RediSkript.class);
         switch (mode) {
             case ADD:
             case SET:
